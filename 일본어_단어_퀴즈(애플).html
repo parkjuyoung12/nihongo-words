@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일본어 단어 퀴즈</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 480px;
+            padding: 32px 24px;
+            text-align: center;
+        }
+        .lesson-selector {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .btn-lesson {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 2px solid #dee2e6;
+            background-color: #ffffff;
+            color: #495057;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-lesson:hover {
+            border-color: #4c6ef5;
+            color: #4c6ef5;
+        }
+        .btn-lesson.active {
+            background-color: #4c6ef5;
+            border-color: #4c6ef5;
+            color: #ffffff;
+        }
+        .btn-lesson.memory {
+            border-color: #fcc419;
+            color: #f59f00;
+        }
+        .btn-lesson.memory:hover {
+            border-color: #f59f00;
+            color: #f59f00;
+        }
+        .btn-lesson.memory.active {
+            background-color: #f59f00;
+            border-color: #f59f00;
+            color: #ffffff;
+        }
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+        .btn-mode {
+            flex: 1;
+            padding: 8px 6px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 2px solid #ced4da;
+            background-color: #f8f9fa;
+            color: #495057;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-mode:hover {
+            border-color: #20c997;
+            color: #20c997;
+        }
+        .btn-mode.active {
+            background-color: #20c997;
+            border-color: #20c997;
+            color: #ffffff;
+        }
+        .header {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4px;
+        }
+        .word-card {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 40px 20px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .korean-word {
+            font-size: 32px;
+            font-weight: bold;
+            color: #212529;
+            word-break: keep-all;
+        }
+        .btn-star {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #adb5bd;
+            transition: transform 0.2s, color 0.2s;
+            width: auto;
+            padding: 0;
+        }
+        .btn-star:hover {
+            transform: scale(1.15);
+        }
+        .btn-star.active {
+            color: #f59f00;
+        }
+        .trace-toggle-wrap {
+            margin-bottom: 16px;
+        }
+        .btn-trace-toggle {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 14px;
+            font-weight: 600;
+            border: 2px solid #4c6ef5;
+            background-color: #ffffff;
+            color: #4c6ef5;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-trace-toggle:hover {
+            background-color: #edf2ff;
+        }
+        .btn-trace-toggle.active {
+            background-color: #4c6ef5;
+            color: #ffffff;
+        }
+        .trace-section {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .trace-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #495057;
+            font-weight: 600;
+            word-break: keep-all;
+            text-align: left;
+        }
+        .btn-trace-clear {
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            background-color: #e9ecef;
+            color: #495057;
+            border-radius: 6px;
+            cursor: pointer;
+            flex: none;
+        }
+        .btn-trace-clear:hover {
+            background-color: #dee2e6;
+        }
+        #trace-canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 400 / 220;
+            background-color: #ffffff;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            touch-action: none;
+            cursor: crosshair;
+        }
+        .trace-hint {
+            font-size: 11px;
+            color: #adb5bd;
+            margin-top: 6px;
+            text-align: left;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 18px;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            outline: none;
+            text-align: center;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        input[type="text"]:focus {
+            border-color: #4d90fe;
+        }
+        .feedback {
+            min-height: 24px;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .feedback.correct {
+            color: #2b8a3e;
+        }
+        .feedback.incorrect {
+            color: #e03131;
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+        button {
+            flex: 1;
+            padding: 12px 0;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, opacity 0.2s;
+        }
+        .btn-prev {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        .btn-prev:hover {
+            background-color: #dee2e6;
+        }
+        .btn-submit {
+            background-color: #3b5bdb;
+            color: #ffffff;
+        }
+        .btn-submit:hover {
+            background-color: #364fc7;
+        }
+        .btn-next {
+            background-color: #4c6ef5;
+            color: #ffffff;
+        }
+        .btn-next:hover {
+            background-color: #4263eb;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="lesson-selector" id="lesson-selector">
+        <button class="btn-lesson active" onclick="selectLesson(event, 'all')">전체</button>
+        <button class="btn-lesson" onclick="selectLesson(event, '1')">1과</button>
+        <button class="btn-lesson" onclick="selectLesson(event, '2')">2과</button>
+        <button class="btn-lesson" onclick="selectLesson(event, '3')">3과</button>
+        <button class="btn-lesson" onclick="selectLesson(event, '4')">4과</button>
+        <button class="btn-lesson" onclick="selectLesson(event, '5')">5과</button>
+        <button class="btn-lesson" onclick="selectLesson(event, '6')">6과</button>
+        <button class="btn-lesson" onclick="selectLesson(event, '7')">7과</button>
+        <button class="btn-lesson" onclick="selectLesson(event, '8')">8과</button>
+        <button class="btn-lesson" onclick="selectLesson(event, '9')">9과</button>
+        <button class="btn-lesson" onclick="selectLesson(event, '10')">10과</button>
+        <button class="btn-lesson memory" onclick="selectLesson(event, 'memory')">★ 기억 단어장</button>
+    </div>
+
+    <div class="mode-selector" id="mode-selector">
+        <button class="btn-mode active" id="mode-korean" onclick="selectQuizMode('korean')">한글 ➔ 히라가나</button>
+        <button class="btn-mode" id="mode-japanese" onclick="selectQuizMode('japanese')">히라가나 ➔ 한글</button>
+        <button class="btn-mode" id="mode-kanji" onclick="selectQuizMode('kanji')">한자 ➔ 히라가나</button>
+    </div>
+
+    <div class="header">
+        <span id="progress-info">문제 0 / 0</span>
+        <span id="memory-count-info" style="font-size: 12px; color: #f59f00;">기억 단어: 0개</span>
+    </div>
+
+    <div class="word-card">
+        <button type="button" class="btn-star" id="btn-star" onclick="toggleMemoryWord()" title="기억 단어장에 저장/해제">★</button>
+        <div class="korean-word" id="korean-text">-</div>
+    </div>
+
+    <div class="trace-toggle-wrap">
+        <button type="button" class="btn-trace-toggle" id="btn-trace-toggle" onclick="toggleTraceSection()">✍️ 따라쓰기 연습</button>
+    </div>
+
+    <div class="trace-section" id="trace-section" style="display:none;">
+        <div class="trace-header">
+            <span id="trace-target-label">따라쓰기: -</span>
+            <button type="button" class="btn-trace-clear" onclick="clearTraceCanvas()">지우기</button>
+        </div>
+        <canvas id="trace-canvas" width="400" height="220"></canvas>
+        <div class="trace-hint">마우스, 손가락, S펜/애플펜슬로 회색 글자 위에 따라 써보세요.</div>
+    </div>
+
+    <form id="quiz-form" onsubmit="handleFormSubmit(event)">
+        <div class="input-group">
+            <input
+                    type="text"
+                    id="japanese-input"
+                    placeholder="답 입력 (Enter로 제출)"
+                    autocomplete="off"
+            >
+        </div>
+
+        <div class="feedback" id="feedback-text"></div>
+
+        <div class="btn-group">
+            <button type="button" class="btn-prev" id="btn-prev" onclick="goPrevious()">이전</button>
+            <button type="submit" class="btn-submit" id="btn-submit">확인</button>
+            <button type="button" class="btn-next" id="btn-next" onclick="goNext()">다음</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const wordList = {
+        "1": [
+            { korean: "~씨 (～様/～氏)", japanese: "～さん" },
+            { korean: "안녕하세요. (낮인사)", japanese: "こんにちは" },
+            { korean: "~의", japanese: "～の" },
+            { korean: "직업 (仕事)", japanese: "しごと" },
+            { korean: "~은/~는", japanese: "～は" },
+            { korean: "무엇입니까? (何ですか)", japanese: "なんですか" },
+            { korean: "회사원 (会社員)", japanese: "かいしゃいん" },
+            { korean: "~도", japanese: "～も" },
+            { korean: "저/나 (私)", japanese: "わたし" },
+            { korean: "당신/너 (貴方)", japanese: "あなた" },
+            { korean: "그 (彼)", japanese: "かれ" },
+            { korean: "그녀 (彼女)", japanese: "かのじょ" },
+            { korean: "누구 (誰)", japanese: "だれ" },
+            { korean: "어느 분 (何方)", japanese: "どなた" },
+            { korean: "선생님 (先生)", japanese: "せんせい" },
+            { korean: "은행원 (銀行員)", japanese: "ぎんこういん" },
+            { korean: "학생 (学生)", japanese: "がくせい" },
+            { korean: "가수 (歌手)", japanese: "かしゅ" },
+            { korean: "고등학생 (高校生)", japanese: "こうこうせい" },
+            { korean: "의사 (医者)", japanese: "いしゃ" },
+            { korean: "간호사 (看護師)", japanese: "かんごし" },
+            { korean: "공무원 (公務員)", japanese: "こうむいん" },
+            { korean: "교수 (教授)", japanese: "きょうじゅ" },
+            { korean: "주부 (主婦)", japanese: "しゅふ" },
+            { korean: "디자이너", japanese: "デザイナー" },
+            { korean: "엔지니어", japanese: "エンジニア" },
+            { korean: "아르바이트로 생활을 하는 사람", japanese: "フリーター" },
+            { korean: "한국인", japanese: "かんこくじん" },
+            { korean: "중국인", japanese: "ちゅうこくじん" },
+            { korean: "일본인", japanese: "にほんじん" },
+            { korean: "태국인", japanese: "タイじん" },
+            { korean: "미국인", japanese: "アメリカじん" },
+            { korean: "영국인", japanese: "イギリスじん" },
+            { korean: "독일인", japanese: "ドイツじん" },
+            { korean: "러시아인", japanese: "ロシアじん" },
+            { korean: "프랑스인", japanese: "フランスじん" },
+            { korean: "한국어 (韓国語)", japanese: "かんこくご" },
+            { korean: "중국어 (中国語)", japanese: "ちゅうこくご" },
+            { korean: "일본어 (日本語)", japanese: "にほんご" },
+            { korean: "태국어 (タイ語)", japanese: "タイご" },
+            { korean: "영어 (英語)", japanese: "えいご" },
+            { korean: "독일어 (ドイツ語)", japanese: "ドイツご" },
+            { korean: "러시아어 (ロシア語)", japanese: "ロシアご" },
+            { korean: "프랑스어 (フランス語)", japanese: "フランスご" }
+        ],
+        "2": [
+            { korean: "이것", japanese: "これ" },
+            { korean: "그것", japanese: "それ" },
+            { korean: "저것", japanese: "あれ" },
+            { korean: "어느 것", japanese: "どれ" },
+            { korean: "컴퓨터", japanese: "パソコン" },
+            { korean: "한국 (韓国)", japanese: "かんこく" },
+            { korean: "일본 (日本)", japanese: "にほん" },
+            { korean: "연필 (鉛筆)", japanese: "えんぴつ" },
+            { korean: "시계 (時計)", japanese: "とけい" },
+            { korean: "우산 (傘)", japanese: "かさ" },
+            { korean: "신문 (新聞)", japanese: "しんぶん" },
+            { korean: "의자 (椅子)", japanese: "いす" },
+            { korean: "지갑 (財布)", japanese: "さいふ" },
+            { korean: "전화 (電話)", japanese: "でんわ" },
+            { korean: "책 (本)", japanese: "ほん" },
+            { korean: "책상 (机)", japanese: "つくえ" },
+            { korean: "휴대폰", japanese: "ケータイ" },
+            { korean: "서울", japanese: "ソウル" },
+            { korean: "대학 (大学)", japanese: "だいがく" },
+            { korean: "가방 (鞄)", japanese: "かばん" },
+            { korean: "사전 (辞書)", japanese: "じしょ" },
+            { korean: "카메라", japanese: "カメラ" },
+            { korean: "잡지 (雑誌)", japanese: "ざっし" },
+            { korean: "지갑 (財布)", japanese: "さいふ" },
+            { korean: "구두/신발 (靴)", japanese: "くつ" },
+            { korean: "모자 (帽子)", japanese: "ぼうし" },
+            { korean: "이~", japanese: "この" },
+            { korean: "그~", japanese: "その" },
+            { korean: "저~", japanese: "あの" },
+            { korean: "어느~", japanese: "どの" },
+            { korean: "공책", japanese: "ノート" },
+            { korean: "안경 (眼鏡)", japanese: "めがね" },
+            { korean: "컴퓨터", japanese: "パソコン" },
+            { korean: "자동차 (車)", japanese: "くるま" },
+            { korean: "텔레비전", japanese: "テレビ" }
+        ],
+        "3": [
+            { korean: "지금 (今)", japanese: "いま" },
+            { korean: "몇시 (何時)", japanese: "なんじ" },
+            { korean: "반 (半)", japanese: "はん" },
+            { korean: "도서관 (図書館)", japanese: "としょかん" },
+            { korean: "~부터", japanese: "～から" },
+            { korean: "~까지", japanese: "～まで" },
+            { korean: "오전 (午前)", japanese: "ごぜん" },
+            { korean: "오후 (午後)", japanese: "ごご" },
+            { korean: "여기", japanese: "ここ" },
+            { korean: "몇분 (何分)", japanese: "なんぷん" },
+            { korean: "아르바이트", japanese: "アルバイト" },
+            { korean: "동경 (東京)", japanese: "とうきょう" },
+            { korean: "회사 (会社)", japanese: "かいしゃ" },
+            { korean: "점심시간 (昼休み)", japanese: "ひるやすみ" },
+            { korean: "시험", japanese: "テスト" },
+            { korean: "백화점", japanese: "デパート" },
+            { korean: "수업 (授業)", japanese: "じゅぎょう" },
+            { korean: "역 (駅)", japanese: "えき" },
+            { korean: "시간 (時間)", japanese: "じかん" }
+        ],
+        "4": [
+            { korean: "학교 (学校)", japanese: "がっこう" },
+            { korean: "집 (家)", japanese: "うち" },
+            { korean: "친구 (友達)", japanese: "ともだち" },
+            { korean: "공부 (勉強)", japanese: "べんきょう" },
+            { korean: "그렇네요", japanese: "そうですね" },
+            { korean: "조금 (少し)", japanese: "すこし" },
+            { korean: "초밥 (寿司)", japanese: "すし" },
+            { korean: "한자 (漢字)", japanese: "かんじ" },
+            { korean: "날씨 (天気)", japanese: "てんき" },
+            { korean: "오늘 (今日)", japanese: "きょう" },
+            { korean: "덥다 (暑い)", japanese: "あつい" },
+            { korean: "춥다 (寒い)", japanese: "さむい" },
+            { korean: "높다/비싸다 (高い)", japanese: "たかい" },
+            { korean: "싸다 (安い)", japanese: "やすい" },
+            { korean: "크다 (大きい)", japanese: "おおきい" },
+            { korean: "작다 (小さい)", japanese: "ちいさい" },
+            { korean: "가깝다 (近い)", japanese: "ちかい" },
+            { korean: "멀다 (遠い)", japanese: "とおい" },
+            { korean: "새롭다 (新しい)", japanese: "あたらしい" },
+            { korean: "낡다 (古い)", japanese: "ふるい" },
+            { korean: "어렵다 (難しい)", japanese: "むずかしい" },
+            { korean: "쉽다/상냥하다/다정하다 (易しい)", japanese: "やさしい" },
+            { korean: "나쁘다 (悪い)", japanese: "わるい" },
+            { korean: "좋다 (良い)", japanese: "いい/よい" },
+            { korean: "많다 (多い)", japanese: "おおい" },
+            { korean: "적다 (少ない)", japanese: "すくない" },
+            { korean: "맛있다 (美味しい)", japanese: "おいしい" },
+            { korean: "재미있다 (面白い)", japanese: "おもしろい" },
+            { korean: "바쁘다 (忙しい)", japanese: "いそがしい" },
+            { korean: "귀엽다", japanese: "かわいい" }
+        ],
+        "5": [
+            { korean: "이~", japanese: "この" },
+            { korean: "그~", japanese: "その" },
+            { korean: "저~", japanese: "あの" },
+            { korean: "어느~", japanese: "どの" },
+            { korean: "그렇습니까", japanese: "そうですか" },
+            { korean: "하지만", japanese: "でも" },
+            { korean: "어떻습니까", japanese: "どうですか" },
+            { korean: "요리 (料理)", japanese: "りょうり" },
+            { korean: "키가크다 (背が高い)", japanese: "せがたかい" },
+            { korean: "사람 (人)", japanese: "ひと" },
+            { korean: "쥬스", japanese: "ジュース" },
+            { korean: "방 (部屋)", japanese: "へや" },
+            { korean: "가게 (店)", japanese: "みせ" },
+            { korean: "어떤", japanese: "どんな" },
+            { korean: "영화 (映画)", japanese: "えいが" },
+            { korean: "자동차 (車)", japanese: "くるま" },
+            { korean: "케이크", japanese: "ケーキ" },
+            { korean: "넓다 (広い)", japanese: "ひろい" },
+            { korean: "좁다 (狭い)", japanese: "せまい" },
+            { korean: "무겁다 (重い)", japanese: "おもい" },
+            { korean: "가볍다 (軽い)", japanese: "かるい" },
+            { korean: "낮다 (低い)", japanese: "ひくい" },
+            { korean: "밝다 (明るい)", japanese: "あかるい" },
+            { korean: "어둡다 (暗い)", japanese: "くらい" },
+            { korean: "길다 (長い)", japanese: "ながい" },
+            { korean: "짧다 (短い)", japanese: "みじかい" },
+            { korean: "무섭다 (怖い)", japanese: "こわい" },
+            { korean: "시끄럽다 (煩い)", japanese: "うるさい" },
+            { korean: "빠르다 (早い/速い)", japanese: "はやい" },
+            { korean: "강하다 (強い)", japanese: "つよい" },
+            { korean: "달다 (甘い)", japanese: "あまい" },
+            { korean: "맵다 (辛い)", japanese: "からい" },
+            { korean: "까맣다 (黒い)", japanese: "くろい" },
+            { korean: "하얗다 (白い)", japanese: "しろい" },
+            { korean: "빨갛다 (赤い)", japanese: "あかい" },
+            { korean: "파랗다 (青い)", japanese: "あおい" }
+        ],
+        "6": [
+            { korean: "매우", japanese: "とても" },
+            { korean: "그렇네요", japanese: "そうですね" },
+            { korean: "사람", japanese: "ひと" },
+            { korean: "거리 (街)", japanese: "まち" },
+            { korean: "노래방", japanese: "カラオケ" },
+            { korean: "노래 (歌)", japanese: "うた" },
+            { korean: "그다지/별로", japanese: "あまり" },
+            { korean: "차 (車)", japanese: "くるま" },
+            { korean: "이", japanese: "この" },
+            { korean: "그 (彼)", japanese: "かれ" },
+            { korean: "피아노", japanese: "ピアノ" },
+            { korean: "스포츠", japanese: "スポーツ" },
+            { korean: "좋아하다 (好きだ)", japanese: "すきだ" },
+            { korean: "싫어하다 (嫌いだ)", japanese: "きらいだ" },
+            { korean: "잘하다/능숙하다 (上手だ)", japanese: "じょうずだ" },
+            { korean: "잘 못하다/서투르다 (下手だ)", japanese: "へただ" },
+            { korean: "편리하다 (便利だ)", japanese: "べんりだ" },
+            { korean: "불편하다 (不便だ)", japanese: "ふべんだ" },
+            { korean: "조용하다 (静かだ)", japanese: "しずかだ" },
+            { korean: "번화하다 (賑やかだ)", japanese: "にぎやかだ" },
+            { korean: "친절하다 (親切だ)", japanese: "しんせつだ" },
+            { korean: "성실하다 (真面目だ)", japanese: "まじめだ" },
+            { korean: "건강하다 (元気だ)", japanese: "げんきだ" },
+            { korean: "튼튼하다 (丈夫だ)", japanese: "じょうぶだ" },
+            { korean: "깨끗하다/예쁘다", japanese: "きれいだ" },
+            { korean: "핸섬하다", japanese: "ハンサムだ" },
+            { korean: "유명하다 (有名だ)", japanese: "ゆうめいだ" },
+            { korean: "간단하다 (簡単だ)", japanese: "かんたんだ" },
+            { korean: "한가하다 (暇だ)", japanese: "ひまだ" },
+            { korean: "훌륭하다 (立派だ)", japanese: "りっぱだ" },
+            { korean: "신선하다 (新鮮だ)", japanese: "しんせんだ" },
+            { korean: "힘들다 (大変だ)", japanese: "たいへんだ" }
+        ],
+        "7": [
+            { korean: "레스토랑", japanese: "レストラン" },
+            { korean: "매우/아주", japanese: "とても" },
+            { korean: "유명하다 (有名だ)", japanese: "ゆうめいだ" },
+            { korean: "어떤", japanese: "どんな" },
+            { korean: "아주 좋아하다 (大好きだ)", japanese: "だいすきだ" },
+            { korean: "하지만", japanese: "でも" },
+            { korean: "고추냉이", japanese: "わさび" },
+            { korean: "왜/어째서", japanese: "どうして" },
+            { korean: "~때문입니다", japanese: "〜からです" },
+            { korean: "그녀 (彼女)", japanese: "かのじょ" },
+            { korean: "음식 (食べ物)", japanese: "たべもの" },
+            { korean: "훌륭하다 (立派だ)", japanese: "りっぱだ" },
+            { korean: "튼튼하다 (丈夫だ)", japanese: "じょうぶだ" },
+            { korean: "편리하다 (便利だ)", japanese: "べんりだ" },
+            { korean: "지하철 (地下鉄)", japanese: "ちかてつ" },
+            { korean: "빠르다 (速い)", japanese: "はやい" },
+            { korean: "공원 (公園)", japanese: "こうえん" },
+            { korean: "성실하다 (真面目だ)", japanese: "まじめだ" },
+            { korean: "잘한다 (上手だ)", japanese: "じょうずだ" },
+            { korean: "회", japanese: "さしみ" },
+            { korean: "아이 (子ども)", japanese: "こども" },
+            { korean: "건강하다 (元気だ)", japanese: "げんきだ" },
+            { korean: "밝다 (明るい)", japanese: "あかるい" },
+            { korean: "핸섬하다", japanese: "ハンサムだ" },
+            { korean: "사과", japanese: "りんご" },
+            { korean: "반/클래스", japanese: "クラス" },
+            { korean: "드라마", japanese: "ドラマ" },
+            { korean: "스토리", japanese: "ストーリー" }
+        ],
+        "8": [
+            { korean: "~와/~과", japanese: "〜と" },
+            { korean: "어느 쪽", japanese: "どちら" },
+            { korean: "~보다", japanese: "〜より" },
+            { korean: "쪽/~편 (〜方)", japanese: "ほう" },
+            { korean: "~의 중에서 (〜の中で)", japanese: "〜のなかで" },
+            { korean: "언제", japanese: "いつ" },
+            { korean: "가장/제일 (一番)", japanese: "いちばん" },
+            { korean: "고양이 (猫)", japanese: "ねこ" },
+            { korean: "개 (犬)", japanese: "いぬ" },
+            { korean: "클래스/반", japanese: "クラス" },
+            { korean: "키가 크다 (背が高い)", japanese: "せがたかい" },
+            { korean: "카타카나", japanese: "カタカナ" },
+            { korean: "미국", japanese: "アメリカ" },
+            { korean: "멀다 (遠い)", japanese: "とおい" },
+            { korean: "봄 (春)", japanese: "はる" },
+            { korean: "여름 (夏)", japanese: "なつ" },
+            { korean: "가을 (秋)", japanese: "あき" },
+            { korean: "겨울 (冬)", japanese: "ふゆ" },
+            { korean: "귤", japanese: "みかん" },
+            { korean: "딸기", japanese: "いちご" },
+            { korean: "사과", japanese: "りんご" },
+            { korean: "배", japanese: "なし" },
+            { korean: "복숭아", japanese: "もも" },
+            { korean: "포도", japanese: "ぶどう" },
+            { korean: "수박", japanese: "すいか" },
+            { korean: "메론", japanese: "メロン" },
+            { korean: "바나나", japanese: "バナナ" },
+            { korean: "오렌지", japanese: "オレンジ" },
+            { korean: "지하철 (地下鉄)", japanese: "ちかてつ" },
+            { korean: "버스", japanese: "バス" },
+            { korean: "택시", japanese: "タクシー" },
+            { korean: "비행기 (飛行機)", japanese: "ひこうき" },
+            { korean: "배 (船)", japanese: "ふね" },
+            { korean: "수영 (水泳)", japanese: "すいえい" },
+            { korean: "등산 (山登り)", japanese: "やまのぼり" },
+            { korean: "야구 (野球)", japanese: "やきゅう" },
+            { korean: "축구", japanese: "サッカー" },
+            { korean: "테니스", japanese: "テニス" },
+            { korean: "골프", japanese: "ゴルフ" },
+            { korean: "스키", japanese: "スキー" },
+            { korean: "스노보드", japanese: "スノーボード" },
+            { korean: "볼링", japanese: "ボウリング" },
+            { korean: "농구", japanese: "バスケットボール" },
+            { korean: "소주 (焼酎)", japanese: "しょうちゅう" },
+            { korean: "맥주", japanese: "ビール" },
+            { korean: "와인", japanese: "ワイン" },
+            { korean: "칵테일", japanese: "カクテル" },
+            { korean: "위스키", japanese: "ウィスキー" }
+        ],
+        "9": [
+            { korean: "점원 (店員)", japanese: "てんいん" },
+            { korean: "어서 오세요", japanese: "いらっしゃいませ" },
+            { korean: "저기요/죄송합니다", japanese: "すみません" },
+            { korean: "얼마", japanese: "いくら" },
+            { korean: "엔 (円)", japanese: "えん" },
+            { korean: "그러면", japanese: "じゃあ" },
+            { korean: "하나 (1つ)", japanese: "ひとつ" },
+            { korean: "주세요", japanese: "ください" },
+            { korean: "감사합니다", japanese: "ありがとうございます" },
+            { korean: "카메라", japanese: "カメラ" },
+            { korean: "빨갛다 (赤い)", japanese: "あかい" },
+            { korean: "수박", japanese: "すいか" },
+            { korean: "~와/~과", japanese: "〜と" },
+            { korean: "콜라", japanese: "コーラ" },
+            { korean: "커피", japanese: "コーヒー" },
+            { korean: "~씩", japanese: "〜ずつ" },
+            { korean: "케이크", japanese: "ケーキ" },
+            { korean: "몇 개", japanese: "いくつ" },
+            { korean: "주먹밥", japanese: "おにぎり" },
+            { korean: "라면", japanese: "ラーメン" },
+            { korean: "뜨거운 커피", japanese: "ホットコーヒー" },
+            { korean: "우동", japanese: "うどん" },
+            { korean: "햄버거", japanese: "ハンバーガー" },
+            { korean: "샐러드", japanese: "サラダ" },
+            { korean: "안경", japanese: "めがね" },
+            { korean: "텔레비전", japanese: "テレビ" },
+            { korean: "손님 (客)", japanese: "きゃく" },
+            { korean: "도넛", japanese: "ドーナツ" },
+            { korean: "아이스 티", japanese: "アイスティー" },
+            { korean: "전부 해서 (全部で)", japanese: "ぜんぶで" },
+            { korean: "이것으로", japanese: "これで" },
+            { korean: "부탁합니다", japanese: "おねがいします" },
+            { korean: "볼펜", japanese: "ボールペン" },
+            { korean: "노트", japanese: "ノート" },
+            { korean: "모자", japanese: "ぼうし" }
+        ],
+        "10": [
+            { korean: "실례합니다/죄송합니다", japanese: "すみません" },
+            { korean: "~에", japanese: "〜に" },
+            { korean: "은행 (銀行)", japanese: "ぎんこう" },
+            { korean: "~이/~가", japanese: "〜が" },
+            { korean: "있습니다 (사물)", japanese: "あります" },
+            { korean: "통행인 (通行人)", japanese: "つうこうにん" },
+            { korean: "서점/책방 (本屋)", japanese: "ほんや" },
+            { korean: "2층 (2階)", japanese: "にかい" },
+            { korean: "여기", japanese: "ここ" },
+            { korean: "거기", japanese: "そこ" },
+            { korean: "저기", japanese: "あそこ" },
+            { korean: "어디", japanese: "どこ" },
+            { korean: "이쪽", japanese: "こちら" },
+            { korean: "그쪽", japanese: "そちら" },
+            { korean: "저쪽", japanese: "あちら" },
+            { korean: "어느 쪽", japanese: "どちら" },
+            { korean: "화장실", japanese: "トイレ" },
+            { korean: "책상 (机)", japanese: "つくえ" },
+            { korean: "꽃 (花)", japanese: "はな" },
+            { korean: "의자", japanese: "いす" },
+            { korean: "고양이 (猫)", japanese: "ねこ" },
+            { korean: "책장 (本棚)", japanese: "ほんだな" },
+            { korean: "개 (犬)", japanese: "いぬ" },
+            { korean: "침대", japanese: "ベッド" },
+            { korean: "꽃집/화원 (花屋)", japanese: "はなや" },
+            { korean: "편의점", japanese: "コンビニ" },
+            { korean: "(물건/사물이) 있다", japanese: "ある" },
+            { korean: "지금 (今)", japanese: "いま" },
+            { korean: "~학년 (〜年生)", japanese: "〜ねんせい" },
+            { korean: "공부 중 (勉強中)", japanese: "べんきょうちゅう" },
+            { korean: "그다지/별로", japanese: "あまり" },
+            { korean: "가장/제일 (一番)", japanese: "いちばん" },
+            { korean: "(사람/동물이) 있다", japanese: "いる" },
+            { korean: "부럽다", japanese: "うらやましい" },
+            { korean: "위 (上)", japanese: "うえ" },
+            { korean: "아래 (下)", japanese: "した" },
+            { korean: "앞 (前)", japanese: "まえ" },
+            { korean: "뒤 (後ろ)", japanese: "うしろ" },
+            { korean: "오른쪽 (右)", japanese: "みぎ" },
+            { korean: "왼쪽 (左)", japanese: "ひだり" },
+            { korean: "안 (中)", japanese: "なか" },
+            { korean: "밖 (外)", japanese: "そと" },
+            { korean: "옆", japanese: "そば" },
+            { korean: "옆 (隣)", japanese: "となり" },
+            { korean: "근처 (近く)", japanese: "ちかく" },
+            { korean: "사이 (間)", japanese: "あいだ" }
+        ]
+    };
+
+    let currentLesson = 'all';
+    let quizMode = 'korean';
+    let activeWordList = [];
+    let randomizedPool = [];
+    let historyStack = [];
+    let currentIndex = -1;
+    let totalCount = 0;
+
+    let memoryWords = [];
+    // localStorage를 실제로 쓸 수 있는지 여부 (아이폰 등에서 파일을 로컬(file://)로 열면
+    // 브라우저 보안 정책 때문에 localStorage 접근이 막혀 예외가 발생할 수 있음)
+    let storageAvailable = true;
+
+    let isTraceCanvasInitialized = false;
+    let isDrawing = false;
+    let lastTracePos = { x: 0, y: 0 };
+
+    function shuffle(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    function extractKanji(text) {
+        const match = text.match(/\((.*?)\)/);
+        return match ? match[1] : '';
+    }
+
+    function removeKanji(text) {
+        return text.replace(/\s*\(.*?\)\s*/g, '').trim();
+    }
+
+    function getQuestionText(wordObj) {
+        if (quizMode === 'korean') {
+            return wordObj.korean;
+        } else if (quizMode === 'japanese') {
+            const kanji = extractKanji(wordObj.korean);
+            const pureJapanese = removeKanji(wordObj.japanese);
+            return kanji ? `${pureJapanese} (${kanji})` : pureJapanese;
+        } else if (quizMode === 'kanji') {
+            const kanji = extractKanji(wordObj.korean);
+            return kanji ? kanji : wordObj.korean;
+        }
+    }
+
+    function getCorrectAnswer(wordObj) {
+        if (quizMode === 'korean' || quizMode === 'kanji') {
+            return wordObj.japanese;
+        } else {
+            return wordObj.korean;
+        }
+    }
+
+    function getTraceText(wordObj) {
+        if (!wordObj) return '';
+        const kanji = extractKanji(wordObj.korean);
+        return kanji || wordObj.japanese;
+    }
+
+    // ===== 기억 단어 저장/로드 (localStorage 접근을 try/catch로 감싸 iOS 등에서
+    // 예외가 발생해도 앱 전체가 멈추지 않고 메모리에서만이라도 동작하도록 함) =====
+    function loadMemoryWords() {
+        try {
+            const stored = localStorage.getItem('japanese_memory_words');
+            if (stored) {
+                memoryWords = JSON.parse(stored);
+            }
+        } catch (e) {
+            storageAvailable = false;
+            memoryWords = [];
+            console.warn('localStorage를 사용할 수 없어 기억 단어는 이번 세션에서만 유지됩니다.', e);
+        }
+        updateMemoryCountUI();
+    }
+
+    function saveMemoryWords() {
+        if (storageAvailable) {
+            try {
+                localStorage.setItem('japanese_memory_words', JSON.stringify(memoryWords));
+            } catch (e) {
+                storageAvailable = false;
+                console.warn('localStorage 저장 실패. 이번 세션 동안만 기억 단어가 유지됩니다.', e);
+            }
+        }
+        updateMemoryCountUI();
+    }
+
+    function updateMemoryCountUI() {
+        const countEl = document.getElementById('memory-count-info');
+        if (countEl) {
+            countEl.textContent = `기억 단어: ${memoryWords.length}개`;
+        }
+    }
+
+    function isMemoryWord(word) {
+        if (!word) return false;
+        return memoryWords.some(item => item.japanese === word.japanese && item.korean === word.korean);
+    }
+
+    function toggleMemoryWord() {
+        if (currentIndex < 0 || historyStack.length === 0) return;
+        const currentQuestion = historyStack[currentIndex];
+
+        const wordObj = { korean: currentQuestion.korean, japanese: currentQuestion.japanese };
+
+        if (isMemoryWord(wordObj)) {
+            memoryWords = memoryWords.filter(item => !(item.japanese === wordObj.japanese && item.korean === wordObj.korean));
+        } else {
+            memoryWords.push(wordObj);
+        }
+
+        saveMemoryWords();
+        updateStarButtonState();
+    }
+
+    function updateStarButtonState() {
+        const starBtn = document.getElementById('btn-star');
+        if (currentIndex >= 0 && historyStack[currentIndex]) {
+            const currentQuestion = historyStack[currentIndex];
+            if (isMemoryWord(currentQuestion)) {
+                starBtn.classList.add('active');
+            } else {
+                starBtn.classList.remove('active');
+            }
+        }
+    }
+
+    function selectQuizMode(mode) {
+        quizMode = mode;
+
+        document.getElementById('mode-korean').classList.toggle('active', mode === 'korean');
+        document.getElementById('mode-japanese').classList.toggle('active', mode === 'japanese');
+        document.getElementById('mode-kanji').classList.toggle('active', mode === 'kanji');
+
+        const inputField = document.getElementById('japanese-input');
+        if (mode === 'korean' || mode === 'kanji') {
+            inputField.placeholder = '히라가나 입력 (Enter로 제출)';
+        } else {
+            inputField.placeholder = '한글 입력 (Enter로 제출)';
+        }
+
+        if (historyStack.length > 0 && currentIndex >= 0) {
+            updateDisplay();
+        }
+    }
+
+    function selectLesson(e, lessonKey) {
+        currentLesson = lessonKey;
+
+        const buttons = document.querySelectorAll('.btn-lesson');
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        if (e && e.target) {
+            e.target.classList.add('active');
+        } else {
+            const targetBtn = document.querySelector(`.btn-lesson[onclick*="'${lessonKey}'"]`);
+            if (targetBtn) targetBtn.classList.add('active');
+        }
+
+        if (lessonKey === 'all') {
+            activeWordList = [];
+            Object.keys(wordList).forEach(key => {
+                activeWordList = activeWordList.concat(wordList[key]);
+            });
+        } else if (lessonKey === 'memory') {
+            activeWordList = [...memoryWords];
+            if (activeWordList.length === 0) {
+                alert("기억 단어장에 저장된 단어가 없습니다. 문제를 풀며 ★ 버튼을 눌러 추가해보세요!");
+                return;
+            }
+        } else {
+            activeWordList = wordList[lessonKey] || [];
+        }
+
+        totalCount = activeWordList.length;
+        initQuiz();
+    }
+
+    function initQuiz() {
+        if (activeWordList.length === 0) {
+            activeWordList = [];
+            Object.keys(wordList).forEach(key => {
+                activeWordList = activeWordList.concat(wordList[key]);
+            });
+        }
+
+        totalCount = activeWordList.length;
+        randomizedPool = shuffle(activeWordList);
+        historyStack = [];
+        currentIndex = -1;
+        loadNextQuestion();
+    }
+
+    function updateDisplay() {
+        const currentQuestion = historyStack[currentIndex];
+
+        document.getElementById('progress-info').textContent = `문제 ${currentIndex + 1} / ${totalCount}`;
+        document.getElementById('korean-text').textContent = getQuestionText(currentQuestion);
+
+        const inputField = document.getElementById('japanese-input');
+        if (quizMode === 'korean' || quizMode === 'kanji') {
+            inputField.placeholder = '히라가나 입력 (Enter로 제출)';
+        } else {
+            inputField.placeholder = '한글 입력 (Enter로 제출)';
+        }
+        inputField.value = currentQuestion.userAnswer || '';
+
+        const feedbackEl = document.getElementById('feedback-text');
+        if (currentQuestion.isCorrect !== undefined) {
+            if (currentQuestion.isCorrect) {
+                feedbackEl.textContent = "정답입니다!";
+                feedbackEl.className = "feedback correct";
+            } else {
+                feedbackEl.textContent = `오답입니다. (정답: ${getCorrectAnswer(currentQuestion)})`;
+                feedbackEl.className = "feedback incorrect";
+            }
+        } else {
+            feedbackEl.textContent = "";
+            feedbackEl.className = "feedback";
+        }
+
+        document.getElementById('btn-prev').disabled = (currentIndex <= 0);
+        updateStarButtonState();
+        updateTraceGuide();
+    }
+
+    function loadNextQuestion() {
+        if (currentIndex < historyStack.length - 1) {
+            currentIndex++;
+        } else {
+            if (randomizedPool.length === 0) {
+                randomizedPool = shuffle(activeWordList);
+            }
+
+            const nextWord = randomizedPool.pop();
+            historyStack.push({
+                korean: nextWord.korean,
+                japanese: nextWord.japanese,
+                userAnswer: '',
+                isCorrect: undefined
+            });
+            currentIndex = historyStack.length - 1;
+        }
+        updateDisplay();
+    }
+
+    function checkAnswer(userInput, wordObj) {
+        const trimmedInput = userInput.trim();
+
+        if (quizMode === 'korean' || quizMode === 'kanji') {
+            const targetJapanese = wordObj.japanese.trim();
+            const pureJapanese = removeKanji(targetJapanese);
+            return (trimmedInput === targetJapanese || trimmedInput === pureJapanese);
+        } else {
+            const fullKorean = wordObj.korean.trim();
+            const pureKorean = removeKanji(fullKorean);
+
+            if (trimmedInput === fullKorean || trimmedInput === pureKorean) return true;
+
+            const possibleAnswers = pureKorean.split(/[\/,]/).map(ans => ans.trim());
+            return possibleAnswers.includes(trimmedInput);
+        }
+    }
+
+    function handleFormSubmit(event) {
+        event.preventDefault();
+
+        const inputField = document.getElementById('japanese-input');
+        const userSubmit = inputField.value.trim();
+
+        if (!userSubmit) return;
+
+        const currentQuestion = historyStack[currentIndex];
+        currentQuestion.userAnswer = userSubmit;
+
+        const isCorrect = checkAnswer(userSubmit, currentQuestion);
+        currentQuestion.isCorrect = isCorrect;
+
+        const feedbackEl = document.getElementById('feedback-text');
+
+        if (isCorrect) {
+            feedbackEl.textContent = "정답입니다! 다음 문제로 이동합니다.";
+            feedbackEl.className = "feedback correct";
+
+            setTimeout(() => {
+                loadNextQuestion();
+            }, 600);
+        } else {
+            feedbackEl.textContent = `오답입니다. (정답: ${getCorrectAnswer(currentQuestion)})`;
+            feedbackEl.className = "feedback incorrect";
+
+            const wordObj = { korean: currentQuestion.korean, japanese: currentQuestion.japanese };
+            if (!isMemoryWord(wordObj)) {
+                memoryWords.push(wordObj);
+                saveMemoryWords();
+                updateStarButtonState();
+            }
+        }
+    }
+
+    function goPrevious() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateDisplay();
+        }
+    }
+
+    function goNext() {
+        loadNextQuestion();
+    }
+
+    function toggleTraceSection() {
+        const section = document.getElementById('trace-section');
+        const btn = document.getElementById('btn-trace-toggle');
+        const willShow = (section.style.display === 'none' || !section.style.display);
+
+        section.style.display = willShow ? 'block' : 'none';
+        btn.classList.toggle('active', willShow);
+
+        if (willShow) {
+            initTraceCanvas();
+            updateTraceGuide();
+        }
+    }
+
+    function getCanvasPos(canvas, evt) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: (evt.clientX - rect.left) * (canvas.width / rect.width),
+            y: (evt.clientY - rect.top) * (canvas.height / rect.height)
+        };
+    }
+
+    function drawTraceGuide(text) {
+        const canvas = document.getElementById('trace-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (!text) return;
+
+        let fontSize = 110;
+        const maxWidth = canvas.width * 0.9;
+        ctx.font = `bold ${fontSize}px sans-serif`;
+
+        while (ctx.measureText(text).width > maxWidth && fontSize > 24) {
+            fontSize -= 4;
+            ctx.font = `bold ${fontSize}px sans-serif`;
+        }
+
+        ctx.fillStyle = '#d0d3d8';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+    }
+
+    function updateTraceGuide() {
+        const section = document.getElementById('trace-section');
+        if (!section || section.style.display === 'none' || !section.style.display) return;
+
+        const currentQuestion = historyStack[currentIndex];
+        if (!currentQuestion) return;
+
+        const text = getTraceText(currentQuestion);
+        const label = document.getElementById('trace-target-label');
+        if (label) {
+            label.textContent = `따라쓰기: ${text}`;
+        }
+        drawTraceGuide(text);
+    }
+
+    function clearTraceCanvas() {
+        const currentQuestion = historyStack[currentIndex];
+        if (!currentQuestion) return;
+        drawTraceGuide(getTraceText(currentQuestion));
+    }
+
+    function initTraceCanvas() {
+        if (isTraceCanvasInitialized) return;
+        const canvas = document.getElementById('trace-canvas');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        ctx.lineWidth = 6;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = '#3b5bdb';
+
+        canvas.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            isDrawing = true;
+            lastTracePos = getCanvasPos(canvas, e);
+            if (canvas.setPointerCapture) {
+                canvas.setPointerCapture(e.pointerId);
+            }
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+            if (!isDrawing) return;
+            e.preventDefault();
+            const pos = getCanvasPos(canvas, e);
+            ctx.beginPath();
+            ctx.moveTo(lastTracePos.x, lastTracePos.y);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            lastTracePos = pos;
+        });
+
+        ['pointerup', 'pointercancel', 'pointerleave'].forEach(evtName => {
+            canvas.addEventListener(evtName, () => {
+                isDrawing = false;
+            });
+        });
+
+        isTraceCanvasInitialized = true;
+    }
+
+    window.onload = function() {
+        loadMemoryWords();
+        selectLesson(null, 'all');
+    };
+</script>
+
+</body>
+</html>
