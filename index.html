@@ -105,6 +105,27 @@
             align-items: center;
             padding: 0 4px;
         }
+        .memory-info-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-memory-reset {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border: 1px solid #f59f00;
+            background-color: #fff9e6;
+            color: #f59f00;
+            border-radius: 12px;
+            cursor: pointer;
+            flex: none;
+            transition: all 0.2s;
+        }
+        .btn-memory-reset:hover {
+            background-color: #f59f00;
+            color: #ffffff;
+        }
         .word-card {
             background-color: #f8f9fa;
             border: 2px solid #e9ecef;
@@ -306,7 +327,10 @@
 
     <div class="header">
         <span id="progress-info">문제 0 / 0</span>
-        <span id="memory-count-info" style="font-size: 12px; color: #f59f00;">기억 단어: 0개</span>
+        <div class="memory-info-group">
+            <span id="memory-count-info" style="font-size: 12px; color: #f59f00;">기억 단어: 0개</span>
+            <button type="button" class="btn-memory-reset" id="btn-memory-reset" onclick="resetMemoryWords()" title="기억 단어장 전체 초기화">전체 초기화</button>
+        </div>
     </div>
 
     <div class="word-card">
@@ -679,7 +703,7 @@
             { korean: "~에", japanese: "〜に" },
             { korean: "은행 (銀行)", japanese: "ぎんこう" },
             { korean: "~이/~가", japanese: "〜が" },
-            { korean: "(사물)있습니다", japanese: "あります" },
+            { korean: "(사물)있습니다 ", japanese: "あります" },
             { korean: "통행인 (通行人)", japanese: "つうこうにん" },
             { korean: "서점/책방 (本屋)", japanese: "ほんや" },
             { korean: "2층 (2階)", japanese: "にかい" },
@@ -701,13 +725,13 @@
             { korean: "침대", japanese: "ベッド" },
             { korean: "꽃집/화원 (花屋)", japanese: "はなや" },
             { korean: "편의점", japanese: "コンビニ" },
-            { korean: "(물건/사물이)있다", japanese: "ある" },
+            { korean: "(물건/사물이) 있다", japanese: "ある" },
             { korean: "지금 (今)", japanese: "いま" },
             { korean: "~학년 (〜年生)", japanese: "〜ねんせい" },
             { korean: "공부 중 (勉強中)", japanese: "べんきょうちゅう" },
             { korean: "그다지/별로", japanese: "あまり" },
             { korean: "가장/제일 (一番)", japanese: "いちばん" },
-            { korean: "(사람/동물이)있다", japanese: "いる" },
+            { korean: "(사람/동물이) 있다", japanese: "いる" },
             { korean: "부럽다", japanese: "うらやましい" },
             { korean: "위 (上)", japanese: "うえ" },
             { korean: "아래 (下)", japanese: "した" },
@@ -733,8 +757,6 @@
     let totalCount = 0;
 
     let memoryWords = [];
-    // localStorage를 실제로 쓸 수 있는지 여부 (아이폰 등에서 파일을 로컬(file://)로 열면
-    // 브라우저 보안 정책 때문에 localStorage 접근이 막혀 예외가 발생할 수 있음)
     let storageAvailable = true;
 
     let isTraceCanvasInitialized = false;
@@ -751,15 +773,18 @@
     }
 
     function extractKanji(text) {
+        if (!text) return '';
         const match = text.match(/\((.*?)\)/);
         return match ? match[1] : '';
     }
 
     function removeKanji(text) {
+        if (!text) return '';
         return text.replace(/\s*\(.*?\)\s*/g, '').trim();
     }
 
     function getQuestionText(wordObj) {
+        if (!wordObj) return '-';
         if (quizMode === 'korean') {
             return wordObj.korean;
         } else if (quizMode === 'japanese') {
@@ -773,6 +798,7 @@
     }
 
     function getCorrectAnswer(wordObj) {
+        if (!wordObj) return '';
         if (quizMode === 'korean' || quizMode === 'kanji') {
             return wordObj.japanese;
         } else {
@@ -786,8 +812,6 @@
         return kanji || wordObj.japanese;
     }
 
-    // ===== 기억 단어 저장/로드 (localStorage 접근을 try/catch로 감싸 iOS 등에서
-    // 예외가 발생해도 앱 전체가 멈추지 않고 메모리에서만이라도 동작하도록 함) =====
     function loadMemoryWords() {
         try {
             const stored = localStorage.getItem('japanese_memory_words');
@@ -797,7 +821,7 @@
         } catch (e) {
             storageAvailable = false;
             memoryWords = [];
-            console.warn('localStorage를 사용할 수 없어 기억 단어는 이번 세션에서만 유지됩니다.', e);
+            console.warn('localStorage 접근 불가. 메모리 세션 사용.', e);
         }
         updateMemoryCountUI();
     }
@@ -808,7 +832,6 @@
                 localStorage.setItem('japanese_memory_words', JSON.stringify(memoryWords));
             } catch (e) {
                 storageAvailable = false;
-                console.warn('localStorage 저장 실패. 이번 세션 동안만 기억 단어가 유지됩니다.', e);
             }
         }
         updateMemoryCountUI();
@@ -840,6 +863,24 @@
 
         saveMemoryWords();
         updateStarButtonState();
+    }
+
+    function resetMemoryWords() {
+        if (memoryWords.length === 0) {
+            alert('기억 단어장이 이미 비어 있습니다.');
+            return;
+        }
+
+        const confirmed = confirm(`기억 단어장의 단어 ${memoryWords.length}개를 모두 삭제하시겠습니까?`);
+        if (!confirmed) return;
+
+        memoryWords = [];
+        saveMemoryWords();
+        updateStarButtonState();
+
+        if (currentLesson === 'memory') {
+            selectLesson(null, 'all');
+        }
     }
 
     function updateStarButtonState() {
@@ -889,16 +930,24 @@
         if (lessonKey === 'all') {
             activeWordList = [];
             Object.keys(wordList).forEach(key => {
-                activeWordList = activeWordList.concat(wordList[key]);
+                if (Array.isArray(wordList[key])) {
+                    activeWordList = activeWordList.concat(wordList[key]);
+                }
             });
         } else if (lessonKey === 'memory') {
             activeWordList = [...memoryWords];
             if (activeWordList.length === 0) {
-                alert("기억 단어장에 저장된 단어가 없습니다. 문제를 풀며 ★ 버튼을 눌러 추가해보세요!");
+                alert("기억 단어장에 저장된 단어가 없습니다.");
+                selectLesson(null, 'all');
                 return;
             }
         } else {
             activeWordList = wordList[lessonKey] || [];
+            if (activeWordList.length === 0) {
+                alert(`${lessonKey}과 단어 데이터가 존재하지 않아 전체 단어로 이동합니다.`);
+                selectLesson(null, 'all');
+                return;
+            }
         }
 
         totalCount = activeWordList.length;
@@ -906,10 +955,12 @@
     }
 
     function initQuiz() {
-        if (activeWordList.length === 0) {
+        if (!activeWordList || activeWordList.length === 0) {
             activeWordList = [];
             Object.keys(wordList).forEach(key => {
-                activeWordList = activeWordList.concat(wordList[key]);
+                if (Array.isArray(wordList[key])) {
+                    activeWordList = activeWordList.concat(wordList[key]);
+                }
             });
         }
 
@@ -921,6 +972,12 @@
     }
 
     function updateDisplay() {
+        if (currentIndex < 0 || !historyStack[currentIndex]) {
+            document.getElementById('progress-info').textContent = `문제 0 / 0`;
+            document.getElementById('korean-text').textContent = `-`;
+            return;
+        }
+
         const currentQuestion = historyStack[currentIndex];
 
         document.getElementById('progress-info').textContent = `문제 ${currentIndex + 1} / ${totalCount}`;
@@ -954,6 +1011,8 @@
     }
 
     function loadNextQuestion() {
+        if (!activeWordList || activeWordList.length === 0) return;
+
         if (currentIndex < historyStack.length - 1) {
             currentIndex++;
         } else {
@@ -974,6 +1033,7 @@
     }
 
     function checkAnswer(userInput, wordObj) {
+        if (!wordObj) return false;
         const trimmedInput = userInput.trim();
 
         if (quizMode === 'korean' || quizMode === 'kanji') {
@@ -993,6 +1053,8 @@
 
     function handleFormSubmit(event) {
         event.preventDefault();
+
+        if (currentIndex < 0 || !historyStack[currentIndex]) return;
 
         const inputField = document.getElementById('japanese-input');
         const userSubmit = inputField.value.trim();
@@ -1088,9 +1150,9 @@
         const section = document.getElementById('trace-section');
         if (!section || section.style.display === 'none' || !section.style.display) return;
 
-        const currentQuestion = historyStack[currentIndex];
-        if (!currentQuestion) return;
+        if (currentIndex < 0 || !historyStack[currentIndex]) return;
 
+        const currentQuestion = historyStack[currentIndex];
         const text = getTraceText(currentQuestion);
         const label = document.getElementById('trace-target-label');
         if (label) {
@@ -1100,8 +1162,8 @@
     }
 
     function clearTraceCanvas() {
+        if (currentIndex < 0 || !historyStack[currentIndex]) return;
         const currentQuestion = historyStack[currentIndex];
-        if (!currentQuestion) return;
         drawTraceGuide(getTraceText(currentQuestion));
     }
 
@@ -1145,10 +1207,17 @@
         isTraceCanvasInitialized = true;
     }
 
-    window.onload = function() {
+    function startApp() {
         loadMemoryWords();
         selectLesson(null, 'all');
-    };
+    }
+
+    // iOS 환경에서 DOMContentLoaded / onload 누락 방지를 위한 즉시 실행 및 이벤트 바인딩
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startApp);
+    } else {
+        startApp();
+    }
 </script>
 
 </body>
