@@ -68,6 +68,14 @@
             border-color: #f59f00;
             color: #ffffff;
         }
+        .selected-lessons-info {
+            font-size: 12px;
+            color: #4c6ef5;
+            font-weight: 600;
+            margin-bottom: 12px;
+            min-height: 16px;
+            word-break: keep-all;
+        }
         .mode-selector {
             display: flex;
             justify-content: center;
@@ -304,30 +312,9 @@
 <body>
 
 <div class="container">
-    <div class="lesson-selector" id="lesson-selector">
-        <button class="btn-lesson active" onclick="selectLesson(event, 'all')">전체</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '1')">1과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '2')">2과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '3')">3과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '4')">4과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '5')">5과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '6')">6과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '7')">7과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '8')">8과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '9')">9과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '10')">10과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '11')">11과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '12')">12과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '13')">13과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '14')">14과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '15')">15과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '16')">16과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '17')">17과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '18')">18과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '19')">19과</button>
-        <button class="btn-lesson" onclick="selectLesson(event, '20')">20과</button>
-        <button class="btn-lesson memory" onclick="selectLesson(event, 'memory')">★ 기억 단어장</button>
-    </div>
+    <!-- 과 버튼은 wordList를 기반으로 자동 생성됩니다 (renderLessonSelector) -->
+    <div class="lesson-selector" id="lesson-selector"></div>
+    <div class="selected-lessons-info" id="selected-lessons-info"></div>
 
     <div class="mode-selector" id="mode-selector">
         <button class="btn-mode active" id="mode-korean" onclick="selectQuizMode('korean')">한글 ➔ 히라가나</button>
@@ -382,6 +369,8 @@
 </div>
 
 <script>
+    // ★ 새 과를 추가할 때는 wordList 맨 끝에 "21": [ ... ], 형식으로 이어서 붙이면
+    //   과 버튼이 자동으로 생성됩니다. (HTML 버튼을 따로 추가할 필요 없음)
     const wordList = {
         "1": [
             { korean: "~씨 (～様/～氏)", japanese: "～さん" },
@@ -757,449 +746,450 @@
             { korean: "사이 (間)", japanese: "あいだ" }
         ],
         "11": [
-          { korean: "월요일 (月曜日)", japanese: "げつようび" },
-          { korean: "화요일 (火曜日)", japanese: "かようび" },
-          { korean: "수요일 (水曜日)", japanese: "すいようび" },
-          { korean: "목요일 (木曜日)", japanese: "もくようび" },
-          { korean: "금요일 (金曜日)", japanese: "きんようび" },
-          { korean: "토요일 (土曜日)", japanese: "どようび" },
-          { korean: "일요일 (日曜日)", japanese: "にちようび" },
-　　　　　　{ korean: "4월", japanese: "しがつ" },
-          { korean: "7월", japanese: "しちがつ" },
-         { korean: "9월", japanese: "くがつ" },
-         { korean: "1일", japanese: "ついたち" },
-         { korean: "2일", japanese: "ふつか" },
-         { korean: "3일", japanese: "みっか" },
-         { korean: "4일", japanese: "よっか" },
-         { korean: "5일", japanese: "いつか" },
-         { korean: "6일", japanese: "むいか" },
-         { korean: "7일", japanese: "なのか" },
-         { korean: "8일", japanese: "ようか" },
-         { korean: "9일", japanese: "ここのか" },
-         { korean: "10일", japanese: "とおか" },
-         { korean: "14일", japanese: "じゅうよっか" },
-         { korean: "20일", japanese: "はつか" },
-         { korean: "24일", japanese: "にじゅうよっか" },
-         { korean: "4년", japanese: "よねん" },
-          { korean: "어땠습니까?", japanese: "どうでしたか" },
-          { korean: "여행 (旅行)", japanese: "りょこう" },
-          { korean: "즐겁다 (楽しい)", japanese: "たのしい" },
-          { korean: "언제", japanese: "いつ" },
-          { korean: "날씨 (天気)", japanese: "てんき" },
-          { korean: "덥다 (暑い)", japanese: "あつい" },
-          { korean: "호텔", japanese: "ホテル" },
-          { korean: "싸다 (安い)", japanese: "やすい" },
-          { korean: "요리 (料理)", japanese: "りょうり" },
-          { korean: "방 (部屋)", japanese: "へや" },
-          { korean: "깨끗하다", japanese: "きれいだ" },
-          { korean: "어제 (昨日)", japanese: "きのう" },
-          { korean: "바쁘다 (忙しい)", japanese: "いそがしい" },
-          { korean: "토요일 (土曜日)", japanese: "どようび" },
-          { korean: "한가하다 (暇だ)", japanese: "ひまだ" },
-          { korean: "새롭다 (新しい)", japanese: "あたらしい" },
-          { korean: "일 (仕事)", japanese: "しごと" },
-          { korean: "힘들다 (大変だ)", japanese: "たいへんだ" },
-          { korean: "고등학교 (高校)", japanese: "こうこう" },
-          { korean: "친절하다 (親切だ)", japanese: "しんせつだ" },
-          { korean: "비 (雨)", japanese: "あめ" },
-          { korean: "생일 (お誕生日)", japanese: "おたんじょうび" },
-          { korean: "주말 (週末)", japanese: "しゅうまつ" },
-          { korean: "영화 (映画)", japanese: "えいが" },
-          { korean: "무섭다 (怖い)", japanese: "こわい" },
-          { korean: "오늘 (今日)", japanese: "きょう" },
-          { korean: "수업 (授業)", japanese: "じゅぎょう" },
-          { korean: "어렵다 (難しい)", japanese: "むずかしい" },
-          { korean: "간단하다 (簡単だ)", japanese: "かんたんだ" },
-          { korean: "휴일 (休み)", japanese: "やすみ" },
-          { korean: "지난주 (先週)", japanese: "せんしゅう" },
-          { korean: "시험", japanese: "テスト" },
-          { korean: "몇 월 며칠 (何月何日)", japanese: "なんがつなんにち" },
-          { korean: "내일 (明日)", japanese: "あした" },
-          { korean: "설날 (お正月)", japanese: "おしょうがつ" },
-          { korean: "어린이날 (子どもの日)", japanese: "こどものひ" },
-          { korean: "백화점", japanese: "デパート" },
-          { korean: "세일", japanese: "セール" }
+            { korean: "월요일 (月曜日)", japanese: "げつようび" },
+            { korean: "화요일 (火曜日)", japanese: "かようび" },
+            { korean: "수요일 (水曜日)", japanese: "すいようび" },
+            { korean: "목요일 (木曜日)", japanese: "もくようび" },
+            { korean: "금요일 (金曜日)", japanese: "きんようび" },
+            { korean: "토요일 (土曜日)", japanese: "どようび" },
+            { korean: "일요일 (日曜日)", japanese: "にちようび" },
+            { korean: "4월", japanese: "しがつ" },
+            { korean: "7월", japanese: "しちがつ" },
+            { korean: "9월", japanese: "くがつ" },
+            { korean: "1일", japanese: "ついたち" },
+            { korean: "2일", japanese: "ふつか" },
+            { korean: "3일", japanese: "みっか" },
+            { korean: "4일", japanese: "よっか" },
+            { korean: "5일", japanese: "いつか" },
+            { korean: "6일", japanese: "むいか" },
+            { korean: "7일", japanese: "なのか" },
+            { korean: "8일", japanese: "ようか" },
+            { korean: "9일", japanese: "ここのか" },
+            { korean: "10일", japanese: "とおか" },
+            { korean: "14일", japanese: "じゅうよっか" },
+            { korean: "20일", japanese: "はつか" },
+            { korean: "24일", japanese: "にじゅうよっか" },
+            { korean: "4년", japanese: "よねん" },
+            { korean: "어땠습니까?", japanese: "どうでしたか" },
+            { korean: "여행 (旅行)", japanese: "りょこう" },
+            { korean: "즐겁다 (楽しい)", japanese: "たのしい" },
+            { korean: "언제", japanese: "いつ" },
+            { korean: "날씨 (天気)", japanese: "てんき" },
+            { korean: "덥다 (暑い)", japanese: "あつい" },
+            { korean: "호텔", japanese: "ホテル" },
+            { korean: "싸다 (安い)", japanese: "やすい" },
+            { korean: "요리 (料理)", japanese: "りょうり" },
+            { korean: "방 (部屋)", japanese: "へや" },
+            { korean: "깨끗하다", japanese: "きれいだ" },
+            { korean: "어제 (昨日)", japanese: "きのう" },
+            { korean: "바쁘다 (忙しい)", japanese: "いそがしい" },
+            { korean: "토요일 (土曜日)", japanese: "どようび" },
+            { korean: "한가하다 (暇だ)", japanese: "ひまだ" },
+            { korean: "새롭다 (新しい)", japanese: "あたらしい" },
+            { korean: "일 (仕事)", japanese: "しごと" },
+            { korean: "힘들다 (大変だ)", japanese: "たいへんだ" },
+            { korean: "고등학교 (高校)", japanese: "こうこう" },
+            { korean: "친절하다 (親切だ)", japanese: "しんせつだ" },
+            { korean: "비 (雨)", japanese: "あめ" },
+            { korean: "생일 (お誕生日)", japanese: "おたんじょうび" },
+            { korean: "주말 (週末)", japanese: "しゅうまつ" },
+            { korean: "영화 (映画)", japanese: "えいが" },
+            { korean: "무섭다 (怖い)", japanese: "こわい" },
+            { korean: "오늘 (今日)", japanese: "きょう" },
+            { korean: "수업 (授業)", japanese: "じゅぎょう" },
+            { korean: "어렵다 (難しい)", japanese: "むずかしい" },
+            { korean: "간단하다 (簡単だ)", japanese: "かんたんだ" },
+            { korean: "휴일 (休み)", japanese: "やすみ" },
+            { korean: "지난주 (先週)", japanese: "せんしゅう" },
+            { korean: "시험", japanese: "テスト" },
+            { korean: "몇 월 며칠 (何月何日)", japanese: "なんがつなんにち" },
+            { korean: "내일 (明日)", japanese: "あした" },
+            { korean: "설날 (お正月)", japanese: "おしょうがつ" },
+            { korean: "어린이날 (子どもの日)", japanese: "こどものひ" },
+            { korean: "백화점", japanese: "デパート" },
+            { korean: "세일", japanese: "セール" }
         ],
         "12": [
-          { korean: "이번 주말 (今週末)", japanese: "こんしゅうまつ" },
-          { korean: "~을/를", japanese: "～を" },
-          { korean: "하다", japanese: "する" },
-          { korean: "~을/를 만나다 (～に会う)", japanese: "～にあう" },
-          { korean: "그리고", japanese: "それから" },
-          { korean: "~에", japanese: "～に" },
-          { korean: "가다 (行く)", japanese: "いく" },
-          { korean: "자주", japanese: "よく" },
-          { korean: "노래 (歌)", japanese: "うた" },
-          { korean: "좋아하다 (好きだ)", japanese: "すきだ" },
-          { korean: "즐겁다 (楽しい)", japanese: "たのしい" },
-          { korean: "도서관 (図書館)", japanese: "としょかん" },
-          { korean: "다음 주 (来週)", japanese: "らいしゅう" },
-          { korean: "~에서", japanese: "～で" },
-          { korean: "공부 (勉強)", japanese: "べんきょう" },
-          { korean: "쓰다 (書く)", japanese: "かく" },
-          { korean: "수영하다 (泳ぐ)", japanese: "およぐ" },
-          { korean: "말하다 (話す)", japanese: "はなす" },
-          { korean: "기다리다 (待つ)", japanese: "まつ" },
-          { korean: "죽다 (死ぬ)", japanese: "しぬ" },
-          { korean: "놀다 (遊ぶ)", japanese: "あそぶ" },
-          { korean: "마시다 (飲む)", japanese: "のむ" },
-          { korean: "있다", japanese: "ある" },
-          { korean: "만들다 (作る)", japanese: "つくる" },
-          { korean: "찍다 (撮る)", japanese: "とる" },
-          { korean: "돌아가다 (帰る)", japanese: "かえる" },
-          { korean: "들어가다 (入る)", japanese: "はいる" },
-          { korean: "자르다 (切る)", japanese: "きる" },
-          { korean: "달리다 (走る)", japanese: "はしる" },
-          { korean: "알다 (知る)", japanese: "しる" },
-          { korean: "필요하다 (要る)", japanese: "いる" },
-          { korean: "보다 (見る)", japanese: "みる" },
-          { korean: "일어나다 (起きる)", japanese: "おきる" },
-          { korean: "자다 (寝る)", japanese: "ねる" },
-          { korean: "먹다 (食べる)", japanese: "たべる" },
-          { korean: "오다 (来る)", japanese: "くる" },
-          { korean: "택시", japanese: "タクシー" },
-          { korean: "~을/를 타다 (～に乗る)", japanese: "～にのる" },
-          { korean: "일본요리 (日本料理)", japanese: "にほんりょうり" }
+            { korean: "이번 주말 (今週末)", japanese: "こんしゅうまつ" },
+            { korean: "~을/를", japanese: "～を" },
+            { korean: "하다", japanese: "する" },
+            { korean: "~을/를 만나다 (～に会う)", japanese: "～にあう" },
+            { korean: "그리고", japanese: "それから" },
+            { korean: "~에", japanese: "～に" },
+            { korean: "가다 (行く)", japanese: "いく" },
+            { korean: "자주", japanese: "よく" },
+            { korean: "노래 (歌)", japanese: "うた" },
+            { korean: "좋아하다 (好きだ)", japanese: "すきだ" },
+            { korean: "즐겁다 (楽しい)", japanese: "たのしい" },
+            { korean: "도서관 (図書館)", japanese: "としょかん" },
+            { korean: "다음 주 (来週)", japanese: "らいしゅう" },
+            { korean: "~에서", japanese: "～で" },
+            { korean: "공부 (勉強)", japanese: "べんきょう" },
+            { korean: "쓰다 (書く)", japanese: "かく" },
+            { korean: "수영하다 (泳ぐ)", japanese: "およぐ" },
+            { korean: "말하다 (話す)", japanese: "はなす" },
+            { korean: "기다리다 (待つ)", japanese: "まつ" },
+            { korean: "죽다 (死ぬ)", japanese: "しぬ" },
+            { korean: "놀다 (遊ぶ)", japanese: "あそぶ" },
+            { korean: "마시다 (飲む)", japanese: "のむ" },
+            { korean: "있다", japanese: "ある" },
+            { korean: "만들다 (作る)", japanese: "つくる" },
+            { korean: "찍다 (撮る)", japanese: "とる" },
+            { korean: "돌아가다 (帰る)", japanese: "かえる" },
+            { korean: "들어가다 (入る)", japanese: "はいる" },
+            { korean: "자르다 (切る)", japanese: "きる" },
+            { korean: "달리다 (走る)", japanese: "はしる" },
+            { korean: "알다 (知る)", japanese: "しる" },
+            { korean: "필요하다 (要る)", japanese: "いる" },
+            { korean: "보다 (見る)", japanese: "みる" },
+            { korean: "일어나다 (起きる)", japanese: "おきる" },
+            { korean: "자다 (寝る)", japanese: "ねる" },
+            { korean: "먹다 (食べる)", japanese: "たべる" },
+            { korean: "오다 (来る)", japanese: "くる" },
+            { korean: "택시", japanese: "タクシー" },
+            { korean: "~을/를 타다 (～に乗る)", japanese: "～にのる" },
+            { korean: "일본요리 (日本料理)", japanese: "にほんりょうり" }
         ],
         "13": [
-          { korean: "다음 주 (来週)", japanese: "らいしゅう" },
-          { korean: "생일 (誕生日)", japanese: "たんじょうび" },
-          { korean: "사다 (買う)", japanese: "かう" },
-          { korean: "아직", japanese: "まだ" },
-          { korean: "이제부터", japanese: "これから" },
-          { korean: "함께/같이 (一緒に)", japanese: "いっしょに" },
-          { korean: "쇼핑 (買い物)", japanese: "かいもの" },
-          { korean: "어디", japanese: "どこ" },
-          { korean: "학교 (学校)", japanese: "がっこう" },
-          { korean: "앞 (前)", japanese: "まえ" },
-          { korean: "그렇게 합시다", japanese: "そうしましょう" },
-          { korean: "듣다 (聞く)", japanese: "きく" },
-          { korean: "서두르다 (急ぐ)", japanese: "いそぐ" },
-          { korean: "말하다 (話す)", japanese: "はなす" },
-          { korean: "죽다 (死ぬ)", japanese: "しぬ" },
-          { korean: "놀다 (遊ぶ)", japanese: "あそぶ" },
-          { korean: "마시다 (飲む)", japanese: "のむ" },
-          { korean: "~을/를 타다 (～に乗る)", japanese: "～にのる" },
-          { korean: "밥", japanese: "ごはん" },
-          { korean: "조금 (少し)", japanese: "すこし" },
-          { korean: "쉬다 (休む)", japanese: "やすむ" },
-          { korean: "운동하다 (運動する)", japanese: "うんどうする" },
-          { korean: "일찍 (早く)", japanese: "はやく" },
-          { korean: "애인 (恋人)", japanese: "こいびと" },
-          { korean: "내일 (明日)", japanese: "あした" },
-          { korean: "만나다 (会う)", japanese: "あう" },
-          { korean: "어제 (昨日)", japanese: "きのう" },
-          { korean: "식사 (食事)", japanese: "しょくじ" },
-          { korean: "자다 (寝る)", japanese: "ねる" },
-          { korean: "걸다", japanese: "かける" },
-          { korean: "조금/잠깐", japanese: "ちょっと" },
-          { korean: "바다 (海)", japanese: "うみ" },
-          { korean: "수영하다 (泳ぐ)", japanese: "およぐ" },
-          { korean: "나쁘다 (悪い)", japanese: "わるい" },
-          { korean: "술 (お酒)", japanese: "おさけ" },
-          { korean: "일 (仕事)", japanese: "しごと" },
-          { korean: "많다 (多い)", japanese: "おおい" },
-          { korean: "숙제 (宿題)", japanese: "しゅくだい" },
-          { korean: "노래 부르다 (歌う)", japanese: "うたう" },
-          { korean: "잘 못하다 (下手だ)", japanese: "へただ" },
-          { korean: "집", japanese: "うち" },
-          { korean: "헬스클럽", japanese: "ジム" },
-          { korean: "공원 (公園)", japanese: "こうえん" },
-          { korean: "산책 (散歩)", japanese: "さんぽ" },
-          { korean: "맑음 (晴れ)", japanese: "はれ" },
-          { korean: "역 앞 (駅前)", japanese: "えきまえ" },
-          { korean: "거기에서", japanese: "そこで" },
-          { korean: "우선/먼저", japanese: "まず" },
-          { korean: "그리고 나서", japanese: "それから" },
-          { korean: "기대되다 (楽しみだ)", japanese: "たのしみだ" }
+            { korean: "다음 주 (来週)", japanese: "らいしゅう" },
+            { korean: "생일 (誕生日)", japanese: "たんじょうび" },
+            { korean: "사다 (買う)", japanese: "かう" },
+            { korean: "아직", japanese: "まだ" },
+            { korean: "이제부터", japanese: "これから" },
+            { korean: "함께/같이 (一緒に)", japanese: "いっしょに" },
+            { korean: "쇼핑 (買い物)", japanese: "かいもの" },
+            { korean: "어디", japanese: "どこ" },
+            { korean: "학교 (学校)", japanese: "がっこう" },
+            { korean: "앞 (前)", japanese: "まえ" },
+            { korean: "그렇게 합시다", japanese: "そうしましょう" },
+            { korean: "듣다 (聞く)", japanese: "きく" },
+            { korean: "서두르다 (急ぐ)", japanese: "いそぐ" },
+            { korean: "말하다 (話す)", japanese: "はなす" },
+            { korean: "죽다 (死ぬ)", japanese: "しぬ" },
+            { korean: "놀다 (遊ぶ)", japanese: "あそぶ" },
+            { korean: "마시다 (飲む)", japanese: "のむ" },
+            { korean: "~을/를 타다 (～に乗る)", japanese: "～にのる" },
+            { korean: "밥", japanese: "ごはん" },
+            { korean: "조금 (少し)", japanese: "すこし" },
+            { korean: "쉬다 (休む)", japanese: "やすむ" },
+            { korean: "운동하다 (運動する)", japanese: "うんどうする" },
+            { korean: "일찍 (早く)", japanese: "はやく" },
+            { korean: "애인 (恋人)", japanese: "こいびと" },
+            { korean: "내일 (明日)", japanese: "あした" },
+            { korean: "만나다 (会う)", japanese: "あう" },
+            { korean: "어제 (昨日)", japanese: "きのう" },
+            { korean: "식사 (食事)", japanese: "しょくじ" },
+            { korean: "자다 (寝る)", japanese: "ねる" },
+            { korean: "걸다", japanese: "かける" },
+            { korean: "조금/잠깐", japanese: "ちょっと" },
+            { korean: "바다 (海)", japanese: "うみ" },
+            { korean: "수영하다 (泳ぐ)", japanese: "およぐ" },
+            { korean: "나쁘다 (悪い)", japanese: "わるい" },
+            { korean: "술 (お酒)", japanese: "おさけ" },
+            { korean: "일 (仕事)", japanese: "しごと" },
+            { korean: "많다 (多い)", japanese: "おおい" },
+            { korean: "숙제 (宿題)", japanese: "しゅくだい" },
+            { korean: "노래 부르다 (歌う)", japanese: "うたう" },
+            { korean: "잘 못하다 (下手だ)", japanese: "へただ" },
+            { korean: "집", japanese: "うち" },
+            { korean: "헬스클럽", japanese: "ジム" },
+            { korean: "공원 (公園)", japanese: "こうえん" },
+            { korean: "산책 (散歩)", japanese: "さんぽ" },
+            { korean: "맑음 (晴れ)", japanese: "はれ" },
+            { korean: "역 앞 (駅前)", japanese: "えきまえ" },
+            { korean: "거기에서", japanese: "そこで" },
+            { korean: "우선/먼저", japanese: "まず" },
+            { korean: "그리고 나서", japanese: "それから" },
+            { korean: "기대되다 (楽しみだ)", japanese: "たのしみだ" }
         ],
         "14": [
-          { korean: "저녁밥 (晩ごはん)", japanese: "ばんごはん" },
-          { korean: "수다를 떨다", japanese: "おしゃべりをする" },
-          { korean: "맛있는 것", japanese: "おいしいもの" },
-          { korean: "그러면", japanese: "じゃあ" },
-          { korean: "가게 (店)", japanese: "みせ" },
-          { korean: "정말로 (本当に)", japanese: "ほんとうに" },
-          { korean: "최근/요즘 (最近)", japanese: "さいきん" },
-          { korean: "휴일/휴가 (休み)", japanese: "やすみ" },
-          { korean: "~을/를 갖고 싶다(원한다)", japanese: "～がほしい" },
-          { korean: "청소", japanese: "そうじ" },
-          { korean: "리포트", japanese: "レポート" },
-          { korean: "가족 (家族)", japanese: "かぞく" },
-          { korean: "싫어하다 (嫌いだ)", japanese: "きらいだ" },
-          { korean: "음악 (音楽)", japanese: "おんがく" },
-          { korean: "듣다 (聞く)", japanese: "きく" },
-          { korean: "과자 (お菓子)", japanese: "おかし" },
-          { korean: "걷다 (歩く)", japanese: "あるく" },
-          { korean: "걸다", japanese: "かける" },
-          { korean: "기다리다 (待つ)", japanese: "まつ" },
-          { korean: "단어 (単語)", japanese: "たんご" },
-          { korean: "외우다 (覚える)", japanese: "おぼえる" },
-          { korean: "산책 (散歩)", japanese: "さんぽ" },
-          { korean: "사진 (写真)", japanese: "しゃしん" },
-          { korean: "찍다 (撮る)", japanese: "とる" },
-          { korean: "차가운 (冷たい)", japanese: "つめたい" },
-          { korean: "맥주", japanese: "ビール" },
-          { korean: "배우다 (習う)", japanese: "ならう" },
-          { korean: "누구 (誰)", japanese: "だれ" },
-          { korean: "다음 달 (来月)", japanese: "らいげつ" },
-          { korean: "낡다 (古い)", japanese: "ふるい" },
-          { korean: "어째서/왜", japanese: "どうして" },
-          { korean: "귀엽다", japanese: "かわいい" },
-          { korean: "불편하다 (不便だ)", japanese: "ふべんだ" },
-          { korean: "돈 (お金)", japanese: "おかね" },
-          { korean: "유학가다 (留学する)", japanese: "りゅうがくする" }
+            { korean: "저녁밥 (晩ごはん)", japanese: "ばんごはん" },
+            { korean: "수다를 떨다", japanese: "おしゃべりをする" },
+            { korean: "맛있는 것", japanese: "おいしいもの" },
+            { korean: "그러면", japanese: "じゃあ" },
+            { korean: "가게 (店)", japanese: "みせ" },
+            { korean: "정말로 (本当に)", japanese: "ほんとうに" },
+            { korean: "최근/요즘 (最近)", japanese: "さいきん" },
+            { korean: "휴일/휴가 (休み)", japanese: "やすみ" },
+            { korean: "~을/를 갖고 싶다(원한다)", japanese: "～がほしい" },
+            { korean: "청소", japanese: "そうじ" },
+            { korean: "리포트", japanese: "レポート" },
+            { korean: "가족 (家族)", japanese: "かぞく" },
+            { korean: "싫어하다 (嫌いだ)", japanese: "きらいだ" },
+            { korean: "음악 (音楽)", japanese: "おんがく" },
+            { korean: "듣다 (聞く)", japanese: "きく" },
+            { korean: "과자 (お菓子)", japanese: "おかし" },
+            { korean: "걷다 (歩く)", japanese: "あるく" },
+            { korean: "걸다", japanese: "かける" },
+            { korean: "기다리다 (待つ)", japanese: "まつ" },
+            { korean: "단어 (単語)", japanese: "たんご" },
+            { korean: "외우다 (覚える)", japanese: "おぼえる" },
+            { korean: "산책 (散歩)", japanese: "さんぽ" },
+            { korean: "사진 (写真)", japanese: "しゃしん" },
+            { korean: "찍다 (撮る)", japanese: "とる" },
+            { korean: "차가운 (冷たい)", japanese: "つめたい" },
+            { korean: "맥주", japanese: "ビール" },
+            { korean: "배우다 (習う)", japanese: "ならう" },
+            { korean: "누구 (誰)", japanese: "だれ" },
+            { korean: "다음 달 (来月)", japanese: "らいげつ" },
+            { korean: "낡다 (古い)", japanese: "ふるい" },
+            { korean: "어째서/왜", japanese: "どうして" },
+            { korean: "귀엽다", japanese: "かわいい" },
+            { korean: "불편하다 (不便だ)", japanese: "ふべんだ" },
+            { korean: "돈 (お金)", japanese: "おかね" },
+            { korean: "유학가다 (留学する)", japanese: "りゅうがくする" }
         ],
         "15": [
-          { korean: "여보세요", japanese: "もしもし" },
-          { korean: "이번 주 (今週)", japanese: "こんしゅう" },
-          { korean: "시간 (時間)", japanese: "じかん" },
-          { korean: "생일 파티 (誕生日パーティー)", japanese: "たんじょうびパーティー" },
-          { korean: "*매우중요. 어떻게", japanese: "どうやって" },
-          { korean: "대학 (大学)", japanese: "だいがく" },
-          { korean: "근처 옆", japanese: "そば" },
-          { korean: "~호선 (～号線)", japanese: "～ごうせん" },
-          { korean: "~째 (～目)", japanese: "～め" },
-          { korean: "역 (駅)", japanese: "えき" },
-          { korean: "내리다 (降りる)", japanese: "おりる" },
-          { korean: "알다 (分かる)", japanese: "わかる" },
-          { korean: "기대됩니다 (楽しみです)", japanese: "たのしみです" },
-          { korean: "서두르다 (急ぐ)", japanese: "いそぐ" },
-          { korean: "빌려주다 (貸す)", japanese: "かす" },
-          { korean: "집다 (取る)", japanese: "とる" },
-          { korean: "천천히", japanese: "ゆっくり" },
-          { korean: "쉬다 (休む)", japanese: "やすむ" },
-          { korean: "보여주다 (見せる)", japanese: "みせる" },
-          { korean: "일어나다 (起きる)", japanese: "おきる" },
-          { korean: "단어 (単語)", japanese: "たんご" },
-          { korean: "외우다 (覚える)", japanese: "おぼえる" },
-          { korean: "매일 (毎日)", japanese: "まいにち" },
-          { korean: "운동하다 (運動する)", japanese: "うんどうする" },
-          { korean: "사진 (写真)", japanese: "しゃしん" },
-          { korean: "춤추다 (踊る)", japanese: "おどる" },
-          { korean: "피아노", japanese: "ピアノ" },
-          { korean: "연주하다/치다 (弾く)", japanese: "ひく" },
-          { korean: "만들다 (作る)", japanese: "つくる" }
+            { korean: "여보세요", japanese: "もしもし" },
+            { korean: "이번 주 (今週)", japanese: "こんしゅう" },
+            { korean: "시간 (時間)", japanese: "じかん" },
+            { korean: "생일 파티 (誕生日パーティー)", japanese: "たんじょうびパーティー" },
+            { korean: "*매우중요. 어떻게", japanese: "どうやって" },
+            { korean: "대학 (大学)", japanese: "だいがく" },
+            { korean: "근처 옆", japanese: "そば" },
+            { korean: "~호선 (～号線)", japanese: "～ごうせん" },
+            { korean: "~째 (～目)", japanese: "～め" },
+            { korean: "역 (駅)", japanese: "えき" },
+            { korean: "내리다 (降りる)", japanese: "おりる" },
+            { korean: "알다 (分かる)", japanese: "わかる" },
+            { korean: "기대됩니다 (楽しみです)", japanese: "たのしみです" },
+            { korean: "서두르다 (急ぐ)", japanese: "いそぐ" },
+            { korean: "빌려주다 (貸す)", japanese: "かす" },
+            { korean: "집다 (取る)", japanese: "とる" },
+            { korean: "천천히", japanese: "ゆっくり" },
+            { korean: "쉬다 (休む)", japanese: "やすむ" },
+            { korean: "보여주다 (見せる)", japanese: "みせる" },
+            { korean: "일어나다 (起きる)", japanese: "おきる" },
+            { korean: "단어 (単語)", japanese: "たんご" },
+            { korean: "외우다 (覚える)", japanese: "おぼえる" },
+            { korean: "매일 (毎日)", japanese: "まいにち" },
+            { korean: "운동하다 (運動する)", japanese: "うんどうする" },
+            { korean: "사진 (写真)", japanese: "しゃしん" },
+            { korean: "춤추다 (踊る)", japanese: "おどる" },
+            { korean: "피아노", japanese: "ピアノ" },
+            { korean: "연주하다/치다 (弾く)", japanese: "ひく" },
+            { korean: "만들다 (作る)", japanese: "つくる" }
         ],
-      "16": [
-        { korean: "고등학교 (高校)", japanese: "こうこう" },
-        { korean: "때", japanese: "とき" },
-        { korean: "웃다 (笑う)", japanese: "わらう" },
-        { korean: "전혀 (全然)", japanese: "ぜんぜん" },
-        { korean: "다르다 (違う)", japanese: "ちがう" },
-        { korean: "정말로 (本当に)", japanese: "ほんとうに" },
-        { korean: "살찌다 (太る)", japanese: "ふとる" },
-        { korean: "마르다", japanese: "やせる" },
-        { korean: "매일 (毎日)", japanese: "まいにち" },
-        { korean: "~에 다니다 (に通う)", japanese: "～にかよう" },
-        { korean: "열심히 하다 (頑張る)", japanese: "がんばる" },
-        { korean: "잃어버리다", japanese: "なくす" },
-        { korean: "전부 (全部)", japanese: "ぜんぶ" },
-        { korean: "빌리다 (借りる)", japanese: "かりる" },
-        { korean: "켜다", japanese: "つける" },
-        { korean: "수다를 떨다", japanese: "おしゃべりをする" },
-        { korean: "열 (熱)", japanese: "ねつ" },
-        { korean: "잊어버리다 (忘れる)", japanese: "わすれる" },
-        { korean: "목욕을 하다 (お風呂に入る)", japanese: "おふろにはいる" },
-        { korean: "약속 (約束)", japanese: "やくそく" },
-        { korean: "무슨 일입니까?", japanese: "どうしたんですか" },
-        { korean: "지갑 (財布)", japanese: "さいふ" },
-        { korean: "~에 늦다 (～に遅れる)", japanese: "～におくれる" },
-        { korean: "돈 (お金)", japanese: "おかね" },
-        { korean: "많이", japanese: "たくさん" },
-        { korean: "싸움", japanese: "けんか" },
-        { korean: "앉다 (座る)", japanese: "すわる" },
-        { korean: "데리고 오다 (連れてくる)", japanese: "つれてくる" },
-        { korean: "(차를) 세우다 (止める)", japanese: "とめる" },
-        { korean: "옆 (隣)", japanese: "となり" },
-        { korean: "짐 (荷物)", japanese: "にもつ" },
-        { korean: "놓다/두다 (置く)", japanese: "おく" },
-        { korean: "하루 (一日)", japanese: "いちにち" },
-        { korean: "얼굴 (顔)", japanese: "かお" },
-        { korean: "씻다 (洗う)", japanese: "あらう" },
-        { korean: "아침밥 (朝ごはん)", japanese: "あさごはん" },
-        { korean: "이/이빨 (歯)", japanese: "は" },
-        { korean: "닦다 (磨く)", japanese: "みがく" },
-        { korean: "옷 (服)", japanese: "ふく" },
-        { korean: "입다 (着る)", japanese: "きる" },
-        { korean: "나오다/나가다 (出る)", japanese: "でる" },
-        { korean: "걷다 (歩く)", japanese: "あるく" },
-        { korean: "점심밥 (昼ごはん)", japanese: "ひるごはん" },
-        { korean: "저녁밥 (晩ごはん)", japanese: "ばんごはん" },
-        { korean: "차 (お茶)", japanese: "おちゃ" },
-        { korean: "샤워를 하다 (シャワーを浴びる)", japanese: "シャワーをあびる" },
-        { korean: "최근 (最近)", japanese: "さいきん" },
-        { korean: "다이어트", japanese: "ダイエット" },
-        { korean: "좀처럼", japanese: "なかなか" },
-        { korean: "걱정이다 (心配だ)", japanese: "しんぱいだ" },
-        { korean: "때때로", japanese: "ときどき" },
-        { korean: "그래서", japanese: "それで" },
-        { korean: "전/앞 (前)", japanese: "まえ" },
-        { korean: "실패하다 (失敗する)", japanese: "しっぱいする" },
-        { korean: "이번 (今度)", japanese: "こんど" },
-        { korean: "반드시", japanese: "かならず" },
-        { korean: "올해 (今年)", japanese: "ことし" }
-      ],
-      "17": [
-        { korean: "일로/일 때문에 (仕事で)", japanese: "しごとで" },
-        { korean: "홋카이도/북해도 (北海道)", japanese: "ほっかいどう" },
-        { korean: "아직", japanese: "まだ" },
-        { korean: "게", japanese: "カニ" },
-        { korean: "선물 (お土産)", japanese: "おみやげ" },
-        { korean: "~을/를 원한다", japanese: "～がほしい" },
-        { korean: "부탁하다 (頼む)", japanese: "たのむ" },
-        { korean: "곳", japanese: "ところ" },
-        { korean: "사 오다 (買って来る)", japanese: "かってくる" },
-        { korean: "놓다/두다 (置く)", japanese: "おく" },
-        { korean: "부르다 (呼ぶ)", japanese: "よぶ" },
-        { korean: "입다 (着る)", japanese: "きる" },
-        { korean: "보여주다 (見せる)", japanese: "みせる" },
-        { korean: "기모노 (着物)", japanese: "きもの" },
-        { korean: "배우다 (習う)", japanese: "ならう" },
-        { korean: "야채 (野菜)", japanese: "やさい" },
-        { korean: "약을 먹다 (薬を飲む)", japanese: "くすりをのむ" },
-        { korean: "내리다 (降りる)", japanese: "おりる" },
-        { korean: "매일 밤 (毎晩)", japanese: "まいばん" },
-        { korean: "샤워를 하다 (シャワーを浴びる)", japanese: "シャワーをあびる" },
-        { korean: "외국 (外国)", japanese: "がいこく" },
-        { korean: "~에 살다 (～に住む)", japanese: "～にすむ" },
-        { korean: "영국", japanese: "イギリス" },
-        { korean: "연예인 (芸能人)", japanese: "げいのうじん" },
-        { korean: "지난주 (先週)", japanese: "せんしゅう" },
-        { korean: "해외 여행 (海外旅行)", japanese: "かいがいりょこう" },
-        { korean: "가족 (家族)", japanese: "かぞく" },
-        { korean: "나오다/나가다 (出る)", japanese: "でる" },
-        { korean: "방송/프로그램 (番組)", japanese: "ばんぐみ" },
-        { korean: "퀴즈방송 (クイズ番組)", japanese: "クイズばんぐみ" },
-        { korean: "손 (手)", japanese: "て" },
-        { korean: "이/이빨 (歯)", japanese: "は" },
-        { korean: "닦다 (磨く)", japanese: "みがく" },
-        { korean: "화장 (化粧)", japanese: "けしょう" },
-        { korean: "구두", japanese: "くつ" },
-      　{ korean: "벗다 (脱ぐ)", japanese: "ぬぐ" },
-        { korean: "유학가다 (留学する)", japanese: "りゅうがくする" },
-        { korean: "내다/제출하다 (出す)", japanese: "だす" },
-        { korean: "보내다 (送る)", japanese: "おくる" },
-        { korean: "끝나다 (終わる)", japanese: "おわる" },
-        { korean: "질문 (質問)", japanese: "しつもん" },
-        { korean: "그만두다 (辞める)", japanese: "やめる" },
-        { korean: "대학원 (大学院)", japanese: "だいがくいん" }
-      ],
-      "18": [
-        { korean: "지난 주말 (先週末)", japanese: "せんしゅうまつ" },
-        { korean: "오랜만에 (久しぶりに)", japanese: "ひさしぶりに" },
-        { korean: "부럽다", japanese: "うらやましい" },
-        { korean: "불꽃놀이 (花火)", japanese: "はなび" },
-        { korean: "유카타", japanese: "ゆかた" },
-        { korean: "빈둥빈둥거리다", japanese: "ごろごろする" },
-        { korean: "계속/쭉", japanese: "ずっと" },
-        { korean: "있다", japanese: "いる" },
-        { korean: "끝나다 (終わる)", japanese: "おわる" },
-        { korean: "졸리다 (眠い)", japanese: "ねむい" },
-        { korean: "때 (時)", japanese: "とき" },
-        { korean: "얼굴 (顔)", japanese: "かお" },
-        { korean: "씻다 (洗う)", japanese: "あらう" },
-        { korean: "여름휴가/여름방학 (夏休み)", japanese: "なつやすみ" },
-        { korean: "가르치다 (教える)", japanese: "おしえる" },
-        { korean: "일기 (日記)", japanese: "にっき" },
-        { korean: "메일", japanese: "メール" },
-        { korean: "보내다 (送る)", japanese: "おくる" },
-        { korean: "낮잠을 자다 (昼寝をする)", japanese: "ひるねをする" },
-        { korean: "쉬는 날 (休みの日)", japanese: "やすみのひ" },
-        { korean: "산 (山)", japanese: "やま" },
-        { korean: "~에 오르다 (～に登る)", japanese: "～のぼる" },
-        { korean: "청소", japanese: "そうじ" },
-        { korean: "조금 전/아까", japanese: "さっき" },
-        { korean: "시작하다 (初める)", japanese: "はじめる" },
-        { korean: "지난 달 (先月)", japanese: "せんげつ" },
-        { korean: "배가 부르다", japanese: "おなかがいっぱいだ" },
-        { korean: "작년 (去年)", japanese: "きょねん" },
-        { korean: "~개월 (～ヵ月)", japanese: "～かげつ" },
-        { korean: "반년 (半年)", japanese: "はんとし" },
-        { korean: "자전거 (自転車)", japanese: "じてんしゃ" },
-        { korean: "연주하다 (弾く)", japanese: "ひく" },
-        { korean: "매일 아침 (毎朝)", japanese: "まいあさ" },
-        { korean: "운전하다 (運転する)", japanese: "うんてんする" }
-      ],
-      "19": [
-        { korean: "작문 (作文)", japanese: "さくぶん" },
-        { korean: "테마", japanese: "テーマ" },
-        { korean: "생활 (生活)", japanese: "せいかつ" },
-        { korean: "짧다 (短い)", japanese: "みじかい" },
-        { korean: "안 된다", japanese: "だめだ" },
-        { korean: "여러 가지다", japanese: "いろいろだ" },
-        { korean: "사용하다 (使う)", japanese: "つかう" },
-        { korean: "길게 (長く)", japanese: "ながく" },
-        { korean: "글씨/글자 (字)", japanese: "じ" },
-        { korean: "더럽다/잘 못하다 (汚い)", japanese: "きたない" },
-        { korean: "펜", japanese: "ペン" },
-        { korean: "천천히", japanese: "ゆっくり" },
-        { korean: "깨끗하게/깔끔하게", japanese: "きれいに" },
-        { korean: "앉다　(座る)", japanese: "すわる" },
-        { korean: "빌리다 (借りる)", japanese: "かりる" },
-        { korean: "버리다 (捨てる)", japanese: "すてる" },
-        { korean: "잊어버리다 (忘れる)", japanese: "わすれる" },
-        { korean: "교실 (教室)", japanese: "きょうしつ" },
-        { korean: "담배", japanese: "タバコ" },
-        { korean: "(담배를) 피우다 (吸う)", japanese: "すう" },
-        { korean: "감기 (風邪)", japanese: "かぜ" },
-        { korean: "무리 (無理)", japanese: "むり" },
-        { korean: "보이다 (見える)", japanese: "みえる" },
-        { korean: "약속 (約束)", japanese: "やくそく" },
-        { korean: "매운 것 (辛い物)", japanese: "からいもの" },
-        { korean: "창문 (窓)", japanese: "まど" },
-        { korean: "열다 (開ける)", japanese: "あける" },
-        { korean: "위험하다 (危ない)", japanese: "あぶない" },
-        { korean: "버리다 (捨てる)", japanese: "すてる" },
-        { korean: "데리고 오다 (連れてくる)", japanese: "つれてくる" },
-        { korean: "전화를 받다 (電話に出る)", japanese: "でんわにでる" },
-        { korean: "자르다 (切る)", japanese: "きる" },
-        { korean: "빠르다 (早い)", japanese: "はやい" }
-      ],
-      "20": [
-        { korean: "다음 (次)", japanese: "つぎ" },
-        { korean: "학기 (学期)", japanese: "がっき" },
-        { korean: "이사하다 (引っ越す)", japanese: "ひっこす" },
-        { korean: "가깝다 (近い)", japanese: "ちかい" },
-        { korean: "다니다/통학하다 (通う)", japanese: "かよう" },
-        { korean: "번화하다 (賑やかだ)", japanese: "にぎやかだ" },
-        { korean: "늦게 (遅く)", japanese: "おそく" },
-        { korean: "시끄럽다", japanese: "うるさい" },
-        { korean: "살다/거주하다 (住む)", japanese: "すむ" },
-        { korean: "~보다", japanese: "～より" },
-        { korean: "조용하다 (静かだ)", japanese: "しずかだ" },
-        { korean: "찾다 (探す)", japanese: "さがす" },
-        { korean: "사용하다 (使う)", japanese: "つかう" },
-        { korean: "글씨/글자 (字)", japanese: "じ" },
-        { korean: "싫다", japanese: "いやだ" },
-        { korean: "길 (道)", japanese: "みち" },
-        { korean: "운전하다 (運転する)", japanese: "うんてんする" },
-        { korean: "말/이야기 (話)", japanese: "はなし" },
-        { korean: "알다/이해하다", japanese: "わかる" },
-        { korean: "마을 (町)", japanese: "まち" },
-        { korean: "게임", japanese: "ゲーム" },
-        { korean: "눈 (目)", japanese: "め" },
-        { korean: "아프다 (痛い)", japanese: "いたい" },
-        { korean: "무슨 일입니까?", japanese: "どうしたんですか" },
-        { korean: "배 (お腹)", japanese: "おなか" },
-        { korean: "일하다 (働く)", japanese: "はたらく" },
-        { korean: "피곤하다 (疲れる)", japanese: "つかれる" },
-        { korean: "좁다 (狭い)", japanese: "せまい" },
-        { korean: "생활하다 (生活する)", japanese: "せいかつする" },
-        { korean: "즐겁게 (楽しく)", japanese: "たのしく" },
-        { korean: "트레이너", japanese: "トレーナー" },
-        { korean: "상담하다 (相談する)", japanese: "そうだんする" },
-        { korean: "사우나", japanese: "サウナ" },
-        { korean: "생기다", japanese: "できる" },
-        { korean: "주의 (注意)", japanese: "ちゅうい" },
-        { korean: "먹을 것 (食べ物)", japanese: "たべもの" },
-        { korean: "음료수 (飲み物)", japanese: "のみもの" },
-        { korean: "애완동물", japanese: "ペット" },
-        { korean: "(담배를) 피우다 (吸う)", japanese: "すう" }
-      ],
-};
+        "16": [
+            { korean: "고등학교 (高校)", japanese: "こうこう" },
+            { korean: "때", japanese: "とき" },
+            { korean: "웃다 (笑う)", japanese: "わらう" },
+            { korean: "전혀 (全然)", japanese: "ぜんぜん" },
+            { korean: "다르다 (違う)", japanese: "ちがう" },
+            { korean: "정말로 (本当に)", japanese: "ほんとうに" },
+            { korean: "살찌다 (太る)", japanese: "ふとる" },
+            { korean: "마르다", japanese: "やせる" },
+            { korean: "매일 (毎日)", japanese: "まいにち" },
+            { korean: "~에 다니다 (に通う)", japanese: "～にかよう" },
+            { korean: "열심히 하다 (頑張る)", japanese: "がんばる" },
+            { korean: "잃어버리다", japanese: "なくす" },
+            { korean: "전부 (全部)", japanese: "ぜんぶ" },
+            { korean: "빌리다 (借りる)", japanese: "かりる" },
+            { korean: "켜다", japanese: "つける" },
+            { korean: "수다를 떨다", japanese: "おしゃべりをする" },
+            { korean: "열 (熱)", japanese: "ねつ" },
+            { korean: "잊어버리다 (忘れる)", japanese: "わすれる" },
+            { korean: "목욕을 하다 (お風呂に入る)", japanese: "おふろにはいる" },
+            { korean: "약속 (約束)", japanese: "やくそく" },
+            { korean: "무슨 일입니까?", japanese: "どうしたんですか" },
+            { korean: "지갑 (財布)", japanese: "さいふ" },
+            { korean: "~에 늦다 (～に遅れる)", japanese: "～におくれる" },
+            { korean: "돈 (お金)", japanese: "おかね" },
+            { korean: "많이", japanese: "たくさん" },
+            { korean: "싸움", japanese: "けんか" },
+            { korean: "앉다 (座る)", japanese: "すわる" },
+            { korean: "데리고 오다 (連れてくる)", japanese: "つれてくる" },
+            { korean: "(차를) 세우다 (止める)", japanese: "とめる" },
+            { korean: "옆 (隣)", japanese: "となり" },
+            { korean: "짐 (荷物)", japanese: "にもつ" },
+            { korean: "놓다/두다 (置く)", japanese: "おく" },
+            { korean: "하루 (一日)", japanese: "いちにち" },
+            { korean: "얼굴 (顔)", japanese: "かお" },
+            { korean: "씻다 (洗う)", japanese: "あらう" },
+            { korean: "아침밥 (朝ごはん)", japanese: "あさごはん" },
+            { korean: "이/이빨 (歯)", japanese: "は" },
+            { korean: "닦다 (磨く)", japanese: "みがく" },
+            { korean: "옷 (服)", japanese: "ふく" },
+            { korean: "입다 (着る)", japanese: "きる" },
+            { korean: "나오다/나가다 (出る)", japanese: "でる" },
+            { korean: "걷다 (歩く)", japanese: "あるく" },
+            { korean: "점심밥 (昼ごはん)", japanese: "ひるごはん" },
+            { korean: "저녁밥 (晩ごはん)", japanese: "ばんごはん" },
+            { korean: "차 (お茶)", japanese: "おちゃ" },
+            { korean: "샤워를 하다 (シャワーを浴びる)", japanese: "シャワーをあびる" },
+            { korean: "최근 (最近)", japanese: "さいきん" },
+            { korean: "다이어트", japanese: "ダイエット" },
+            { korean: "좀처럼", japanese: "なかなか" },
+            { korean: "걱정이다 (心配だ)", japanese: "しんぱいだ" },
+            { korean: "때때로", japanese: "ときどき" },
+            { korean: "그래서", japanese: "それで" },
+            { korean: "전/앞 (前)", japanese: "まえ" },
+            { korean: "실패하다 (失敗する)", japanese: "しっぱいする" },
+            { korean: "이번 (今度)", japanese: "こんど" },
+            { korean: "반드시", japanese: "かならず" },
+            { korean: "올해 (今年)", japanese: "ことし" }
+        ],
+        "17": [
+            { korean: "일로/일 때문에 (仕事で)", japanese: "しごとで" },
+            { korean: "홋카이도/북해도 (北海道)", japanese: "ほっかいどう" },
+            { korean: "아직", japanese: "まだ" },
+            { korean: "게", japanese: "カニ" },
+            { korean: "선물 (お土産)", japanese: "おみやげ" },
+            { korean: "~을/를 원한다", japanese: "～がほしい" },
+            { korean: "부탁하다 (頼む)", japanese: "たのむ" },
+            { korean: "곳", japanese: "ところ" },
+            { korean: "사 오다 (買って来る)", japanese: "かってくる" },
+            { korean: "놓다/두다 (置く)", japanese: "おく" },
+            { korean: "부르다 (呼ぶ)", japanese: "よぶ" },
+            { korean: "입다 (着る)", japanese: "きる" },
+            { korean: "보여주다 (見せる)", japanese: "みせる" },
+            { korean: "기모노 (着物)", japanese: "きもの" },
+            { korean: "배우다 (習う)", japanese: "ならう" },
+            { korean: "야채 (野菜)", japanese: "やさい" },
+            { korean: "약을 먹다 (薬を飲む)", japanese: "くすりをのむ" },
+            { korean: "내리다 (降りる)", japanese: "おりる" },
+            { korean: "매일 밤 (毎晩)", japanese: "まいばん" },
+            { korean: "샤워를 하다 (シャワーを浴びる)", japanese: "シャワーをあびる" },
+            { korean: "외국 (外国)", japanese: "がいこく" },
+            { korean: "~에 살다 (～に住む)", japanese: "～にすむ" },
+            { korean: "영국", japanese: "イギリス" },
+            { korean: "연예인 (芸能人)", japanese: "げいのうじん" },
+            { korean: "지난주 (先週)", japanese: "せんしゅう" },
+            { korean: "해외 여행 (海外旅行)", japanese: "かいがいりょこう" },
+            { korean: "가족 (家族)", japanese: "かぞく" },
+            { korean: "나오다/나가다 (出る)", japanese: "でる" },
+            { korean: "방송/프로그램 (番組)", japanese: "ばんぐみ" },
+            { korean: "퀴즈방송 (クイズ番組)", japanese: "クイズばんぐみ" },
+            { korean: "손 (手)", japanese: "て" },
+            { korean: "이/이빨 (歯)", japanese: "は" },
+            { korean: "닦다 (磨く)", japanese: "みがく" },
+            { korean: "화장 (化粧)", japanese: "けしょう" },
+            { korean: "구두", japanese: "くつ" },
+            { korean: "벗다 (脱ぐ)", japanese: "ぬぐ" },
+            { korean: "유학가다 (留学する)", japanese: "りゅうがくする" },
+            { korean: "내다/제출하다 (出す)", japanese: "だす" },
+            { korean: "보내다 (送る)", japanese: "おくる" },
+            { korean: "끝나다 (終わる)", japanese: "おわる" },
+            { korean: "질문 (質問)", japanese: "しつもん" },
+            { korean: "그만두다 (辞める)", japanese: "やめる" },
+            { korean: "대학원 (大学院)", japanese: "だいがくいん" }
+        ],
+        "18": [
+            { korean: "지난 주말 (先週末)", japanese: "せんしゅうまつ" },
+            { korean: "오랜만에 (久しぶりに)", japanese: "ひさしぶりに" },
+            { korean: "부럽다", japanese: "うらやましい" },
+            { korean: "불꽃놀이 (花火)", japanese: "はなび" },
+            { korean: "유카타", japanese: "ゆかた" },
+            { korean: "빈둥빈둥거리다", japanese: "ごろごろする" },
+            { korean: "계속/쭉", japanese: "ずっと" },
+            { korean: "있다", japanese: "いる" },
+            { korean: "끝나다 (終わる)", japanese: "おわる" },
+            { korean: "졸리다 (眠い)", japanese: "ねむい" },
+            { korean: "때 (時)", japanese: "とき" },
+            { korean: "얼굴 (顔)", japanese: "かお" },
+            { korean: "씻다 (洗う)", japanese: "あらう" },
+            { korean: "여름휴가/여름방학 (夏休み)", japanese: "なつやすみ" },
+            { korean: "가르치다 (教える)", japanese: "おしえる" },
+            { korean: "일기 (日記)", japanese: "にっき" },
+            { korean: "메일", japanese: "メール" },
+            { korean: "보내다 (送る)", japanese: "おくる" },
+            { korean: "낮잠을 자다 (昼寝をする)", japanese: "ひるねをする" },
+            { korean: "쉬는 날 (休みの日)", japanese: "やすみのひ" },
+            { korean: "산 (山)", japanese: "やま" },
+            { korean: "~에 오르다 (～に登る)", japanese: "～のぼる" },
+            { korean: "청소", japanese: "そうじ" },
+            { korean: "조금 전/아까", japanese: "さっき" },
+            { korean: "시작하다 (初める)", japanese: "はじめる" },
+            { korean: "지난 달 (先月)", japanese: "せんげつ" },
+            { korean: "배가 부르다", japanese: "おなかがいっぱいだ" },
+            { korean: "작년 (去年)", japanese: "きょねん" },
+            { korean: "~개월 (～ヵ月)", japanese: "～かげつ" },
+            { korean: "반년 (半年)", japanese: "はんとし" },
+            { korean: "자전거 (自転車)", japanese: "じてんしゃ" },
+            { korean: "연주하다 (弾く)", japanese: "ひく" },
+            { korean: "매일 아침 (毎朝)", japanese: "まいあさ" },
+            { korean: "운전하다 (運転する)", japanese: "うんてんする" }
+        ],
+        "19": [
+            { korean: "작문 (作文)", japanese: "さくぶん" },
+            { korean: "테마", japanese: "テーマ" },
+            { korean: "생활 (生活)", japanese: "せいかつ" },
+            { korean: "짧다 (短い)", japanese: "みじかい" },
+            { korean: "안 된다", japanese: "だめだ" },
+            { korean: "여러 가지다", japanese: "いろいろだ" },
+            { korean: "사용하다 (使う)", japanese: "つかう" },
+            { korean: "길게 (長く)", japanese: "ながく" },
+            { korean: "글씨/글자 (字)", japanese: "じ" },
+            { korean: "더럽다/잘 못하다 (汚い)", japanese: "きたない" },
+            { korean: "펜", japanese: "ペン" },
+            { korean: "천천히", japanese: "ゆっくり" },
+            { korean: "깨끗하게/깔끔하게", japanese: "きれいに" },
+            { korean: "앉다　(座る)", japanese: "すわる" },
+            { korean: "빌리다 (借りる)", japanese: "かりる" },
+            { korean: "버리다 (捨てる)", japanese: "すてる" },
+            { korean: "잊어버리다 (忘れる)", japanese: "わすれる" },
+            { korean: "교실 (教室)", japanese: "きょうしつ" },
+            { korean: "담배", japanese: "タバコ" },
+            { korean: "(담배를) 피우다 (吸う)", japanese: "すう" },
+            { korean: "감기 (風邪)", japanese: "かぜ" },
+            { korean: "무리 (無理)", japanese: "むり" },
+            { korean: "보이다 (見える)", japanese: "みえる" },
+            { korean: "약속 (約束)", japanese: "やくそく" },
+            { korean: "매운 것 (辛い物)", japanese: "からいもの" },
+            { korean: "창문 (窓)", japanese: "まど" },
+            { korean: "열다 (開ける)", japanese: "あける" },
+            { korean: "위험하다 (危ない)", japanese: "あぶない" },
+            { korean: "버리다 (捨てる)", japanese: "すてる" },
+            { korean: "데리고 오다 (連れてくる)", japanese: "つれてくる" },
+            { korean: "전화를 받다 (電話に出る)", japanese: "でんわにでる" },
+            { korean: "자르다 (切る)", japanese: "きる" },
+            { korean: "빠르다 (早い)", japanese: "はやい" }
+        ],
+        "20": [
+            { korean: "다음 (次)", japanese: "つぎ" },
+            { korean: "학기 (学期)", japanese: "がっき" },
+            { korean: "이사하다 (引っ越す)", japanese: "ひっこす" },
+            { korean: "가깝다 (近い)", japanese: "ちかい" },
+            { korean: "다니다/통학하다 (通う)", japanese: "かよう" },
+            { korean: "번화하다 (賑やかだ)", japanese: "にぎやかだ" },
+            { korean: "늦게 (遅く)", japanese: "おそく" },
+            { korean: "시끄럽다", japanese: "うるさい" },
+            { korean: "살다/거주하다 (住む)", japanese: "すむ" },
+            { korean: "~보다", japanese: "～より" },
+            { korean: "조용하다 (静かだ)", japanese: "しずかだ" },
+            { korean: "찾다 (探す)", japanese: "さがす" },
+            { korean: "사용하다 (使う)", japanese: "つかう" },
+            { korean: "글씨/글자 (字)", japanese: "じ" },
+            { korean: "싫다", japanese: "いやだ" },
+            { korean: "길 (道)", japanese: "みち" },
+            { korean: "운전하다 (運転する)", japanese: "うんてんする" },
+            { korean: "말/이야기 (話)", japanese: "はなし" },
+            { korean: "알다/이해하다", japanese: "わかる" },
+            { korean: "마을 (町)", japanese: "まち" },
+            { korean: "게임", japanese: "ゲーム" },
+            { korean: "눈 (目)", japanese: "め" },
+            { korean: "아프다 (痛い)", japanese: "いたい" },
+            { korean: "무슨 일입니까?", japanese: "どうしたんですか" },
+            { korean: "배 (お腹)", japanese: "おなか" },
+            { korean: "일하다 (働く)", japanese: "はたらく" },
+            { korean: "피곤하다 (疲れる)", japanese: "つかれる" },
+            { korean: "좁다 (狭い)", japanese: "せまい" },
+            { korean: "생활하다 (生活する)", japanese: "せいかつする" },
+            { korean: "즐겁게 (楽しく)", japanese: "たのしく" },
+            { korean: "트레이너", japanese: "トレーナー" },
+            { korean: "상담하다 (相談する)", japanese: "そうだんする" },
+            { korean: "사우나", japanese: "サウナ" },
+            { korean: "생기다", japanese: "できる" },
+            { korean: "주의 (注意)", japanese: "ちゅうい" },
+            { korean: "먹을 것 (食べ物)", japanese: "たべもの" },
+            { korean: "음료수 (飲み物)", japanese: "のみもの" },
+            { korean: "애완동물", japanese: "ペット" },
+            { korean: "(담배를) 피우다 (吸う)", japanese: "すう" }
+        ]
+    };
 
-    let currentLesson = 'all';
+    let currentLesson = 'all';          // 'all' | 'memory' | 'custom'(체크한 과)
+    let selectedLessons = new Set();    // 체크된 과 번호 (예: "1", "3")
     let quizMode = 'korean';
     let activeWordList = [];
     let randomizedPool = [];
@@ -1365,54 +1355,130 @@
         }
     }
 
-    function selectLesson(e, lessonKey) {
-        currentLesson = lessonKey;
+    // ===== 과 선택 (여러 과 동시 선택 가능) =====
 
-        const buttons = document.querySelectorAll('.btn-lesson');
-        buttons.forEach(btn => btn.classList.remove('active'));
+    function getSortedLessonKeys() {
+        return Object.keys(wordList)
+            .filter(k => Array.isArray(wordList[k]))
+            .sort((a, b) => Number(a) - Number(b));
+    }
 
-        if (e && e.target) {
-            e.target.classList.add('active');
+    function getAllWords() {
+        let all = [];
+        getSortedLessonKeys().forEach(k => {
+            all = all.concat(wordList[k]);
+        });
+        return all;
+    }
+
+    function renderLessonSelector() {
+        const container = document.getElementById('lesson-selector');
+        container.innerHTML = '';
+
+        const allBtn = document.createElement('button');
+        allBtn.className = 'btn-lesson';
+        allBtn.dataset.lesson = 'all';
+        allBtn.textContent = '전체';
+        allBtn.onclick = (e) => selectLesson(e, 'all');
+        container.appendChild(allBtn);
+
+        getSortedLessonKeys().forEach(key => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-lesson';
+            btn.dataset.lesson = key;
+            btn.textContent = `${key}과`;
+            btn.onclick = () => toggleLesson(key);   // 클릭할 때마다 선택/해제
+            container.appendChild(btn);
+        });
+
+        const memoryBtn = document.createElement('button');
+        memoryBtn.className = 'btn-lesson memory';
+        memoryBtn.dataset.lesson = 'memory';
+        memoryBtn.textContent = '★ 기억 단어장';
+        memoryBtn.onclick = (e) => selectLesson(e, 'memory');
+        container.appendChild(memoryBtn);
+
+        updateLessonActiveState();
+    }
+
+    function updateLessonActiveState() {
+        document.querySelectorAll('.btn-lesson').forEach(btn => {
+            const k = btn.dataset.lesson;
+            let active = false;
+            if (k === 'all') active = (currentLesson === 'all');
+            else if (k === 'memory') active = (currentLesson === 'memory');
+            else active = (currentLesson === 'custom' && selectedLessons.has(k));
+            btn.classList.toggle('active', active);
+        });
+
+        const info = document.getElementById('selected-lessons-info');
+        if (info) {
+            if (currentLesson === 'custom' && selectedLessons.size > 0) {
+                const list = [...selectedLessons]
+                    .sort((a, b) => Number(a) - Number(b))
+                    .map(k => `${k}과`)
+                    .join(', ');
+                info.textContent = `선택한 과: ${list}`;
+            } else {
+                info.textContent = '';
+            }
+        }
+    }
+
+    // 과 체크/해제
+    function toggleLesson(key) {
+        if (selectedLessons.has(key)) {
+            selectedLessons.delete(key);
         } else {
-            const targetBtn = document.querySelector(`.btn-lesson[onclick*="'${lessonKey}'"]`);
-            if (targetBtn) targetBtn.classList.add('active');
+            selectedLessons.add(key);
         }
 
-        if (lessonKey === 'all') {
+        if (selectedLessons.size === 0) {
+            // 전부 해제하면 전체 단어로 복귀
+            currentLesson = 'all';
+            activeWordList = getAllWords();
+        } else {
+            currentLesson = 'custom';
             activeWordList = [];
-            Object.keys(wordList).forEach(key => {
-                if (Array.isArray(wordList[key])) {
-                    activeWordList = activeWordList.concat(wordList[key]);
-                }
-            });
-        } else if (lessonKey === 'memory') {
-            activeWordList = [...memoryWords];
-            if (activeWordList.length === 0) {
+            [...selectedLessons]
+                .sort((a, b) => Number(a) - Number(b))
+                .forEach(k => {
+                    if (Array.isArray(wordList[k])) {
+                        activeWordList = activeWordList.concat(wordList[k]);
+                    }
+                });
+        }
+
+        totalCount = activeWordList.length;
+        updateLessonActiveState();
+        initQuiz();
+    }
+
+    // '전체' / '기억 단어장' 선택 (과 체크는 초기화됨)
+    function selectLesson(e, lessonKey) {
+        selectedLessons.clear();
+
+        if (lessonKey === 'memory') {
+            if (memoryWords.length === 0) {
                 alert("기억 단어장에 저장된 단어가 없습니다.");
                 selectLesson(null, 'all');
                 return;
             }
+            currentLesson = 'memory';
+            activeWordList = [...memoryWords];
         } else {
-            activeWordList = wordList[lessonKey] || [];
-            if (activeWordList.length === 0) {
-                alert(`${lessonKey}과 단어 데이터가 존재하지 않아 전체 단어로 이동합니다.`);
-                selectLesson(null, 'all');
-                return;
-            }
+            currentLesson = 'all';
+            activeWordList = getAllWords();
         }
 
         totalCount = activeWordList.length;
+        updateLessonActiveState();
         initQuiz();
     }
 
     function initQuiz() {
         if (!activeWordList || activeWordList.length === 0) {
-            activeWordList = [];
-            Object.keys(wordList).forEach(key => {
-                if (Array.isArray(wordList[key])) {
-                    activeWordList = activeWordList.concat(wordList[key]);
-                }
-            });
+            activeWordList = getAllWords();
         }
 
         totalCount = activeWordList.length;
@@ -1660,6 +1726,7 @@
 
     function startApp() {
         loadMemoryWords();
+        renderLessonSelector();
         selectLesson(null, 'all');
     }
 
