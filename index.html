@@ -268,6 +268,16 @@
         .feedback.incorrect {
             color: #e03131;
         }
+.meaning-text {
+    font-size: 26px;
+    font-weight: 700;
+    color: #2b8a3e;
+    margin: -8px 0 20px;
+    word-break: keep-all;
+}
+.meaning-text:empty {
+    display: none;
+}
         .btn-group {
             display: flex;
             gap: 12px;
@@ -359,6 +369,7 @@
         </div>
 
         <div class="feedback" id="feedback-text"></div>
+	<div class="meaning-text" id="meaning-text"></div>
 
         <div class="btn-group">
             <button type="button" class="btn-prev" id="btn-prev" onclick="goPrevious()">이전</button>
@@ -1206,7 +1217,7 @@
     { korean: "남자 (男の人)", japanese: "おとこのひと" },
     { korean: "모두", japanese: "みんな" },
     { korean: "상냥하다 (優しい)", japanese: "やさしい" },
-    { korean: "타입 ", japanese: "たいぷ" },
+    { korean: "타입 (타입)", japanese: "タイプ" },
     { korean: "유감이다, 아쉽다 (残念だ)", japanese: "ざんねんだ" },
     { korean: "다음에 (今度)", japanese: "こんど" },
     { korean: "소개하다 (紹介する)", japanese: "しょうかいする" },
@@ -1309,6 +1320,22 @@
         const kanji = extractKanji(wordObj.korean);
         return kanji || wordObj.japanese;
     }
+
+// 정답 메시지 (한자 모드에서는 한글 뜻도 함께 표시)
+function getCorrectMessage(withNextNotice) {
+    return withNextNotice ? "정답입니다! 다음 문제로 이동합니다." : "정답입니다!";
+}
+
+// 한자 모드에서 정답일 때만 한글 뜻을 크게 표시
+function showMeaning(wordObj, isCorrect) {
+    const el = document.getElementById('meaning-text');
+    if (!el) return;
+    if (quizMode === 'kanji' && isCorrect) {
+        el.textContent = `뜻: ${removeKanji(wordObj.korean)}`;
+    } else {
+        el.textContent = '';
+    }
+}
 
     function loadMemoryWords() {
         try {
@@ -1566,18 +1593,19 @@
         inputField.value = currentQuestion.userAnswer || '';
 
         const feedbackEl = document.getElementById('feedback-text');
-        if (currentQuestion.isCorrect !== undefined) {
-            if (currentQuestion.isCorrect) {
-                feedbackEl.textContent = "정답입니다!";
-                feedbackEl.className = "feedback correct";
-            } else {
-                feedbackEl.textContent = `오답입니다. (정답: ${getCorrectAnswer(currentQuestion)})`;
-                feedbackEl.className = "feedback incorrect";
-            }
-        } else {
-            feedbackEl.textContent = "";
-            feedbackEl.className = "feedback";
-        }
+if (currentQuestion.isCorrect !== undefined) {
+    if (currentQuestion.isCorrect) {
+        feedbackEl.textContent = getCorrectMessage(false);
+        feedbackEl.className = "feedback correct";
+    } else {
+        feedbackEl.textContent = `오답입니다. (정답: ${getCorrectAnswer(currentQuestion)})`;
+        feedbackEl.className = "feedback incorrect";
+    }
+} else {
+    feedbackEl.textContent = "";
+    feedbackEl.className = "feedback";
+}
+showMeaning(currentQuestion, currentQuestion.isCorrect === true);
 
         document.getElementById('btn-prev').disabled = (currentIndex <= 0);
         updateStarButtonState();
@@ -1644,13 +1672,16 @@
         const feedbackEl = document.getElementById('feedback-text');
 
         if (isCorrect) {
-            feedbackEl.textContent = "정답입니다! 다음 문제로 이동합니다.";
-            feedbackEl.className = "feedback correct";
+    feedbackEl.textContent = getCorrectMessage(true);
+    feedbackEl.className = "feedback correct";
+    showMeaning(currentQuestion, true);
 
-            setTimeout(() => {
-                loadNextQuestion();
-            }, 600);
-        } else {
+    const delay = (quizMode === 'kanji') ? 1500 : 600;
+    setTimeout(() => {
+        loadNextQuestion();
+    }, delay);
+} else {
+    showMeaning(currentQuestion, false);
             feedbackEl.textContent = `오답입니다. (정답: ${getCorrectAnswer(currentQuestion)})`;
             feedbackEl.className = "feedback incorrect";
 
