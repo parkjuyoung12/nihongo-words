@@ -1886,23 +1886,38 @@ showMeaning(currentQuestion, currentQuestion.isCorrect === true);
         }
         updateDisplay();
     }
+    // 비교용 정규화: 공백(전각 포함)과 물결표(~ ～ 〜 ∼ ˜)를 모두 제거
+    function normalizeAnswer(text) {
+        if (!text) return '';
+        return text
+            .normalize('NFKC')                 // ～(전각) 등을 ~로 통일
+            .replace(/[~〜～∼˜]/g, '')        // 모든 종류의 물결표 제거
+            .replace(/\s+/g, '')               // 띄어쓰기(전각 공백 포함) 제거
+            .trim();
+    }
 
     function checkAnswer(userInput, wordObj) {
         if (!wordObj) return false;
-        const trimmedInput = userInput.trim();
+        const input = normalizeAnswer(userInput);
+        if (!input) return false;
 
         if (quizMode === 'korean' || quizMode === 'kanji') {
             const targetJapanese = wordObj.japanese.trim();
             const pureJapanese = removeKanji(targetJapanese);
-            return (trimmedInput === targetJapanese || trimmedInput === pureJapanese);
+
+            // "いい/よい" 처럼 / 로 나뉜 경우 각각도 정답 처리
+            const candidates = [targetJapanese, pureJapanese];
+            pureJapanese.split('/').forEach(p => candidates.push(p));
+
+            return candidates.some(c => normalizeAnswer(c) === input);
         } else {
             const fullKorean = wordObj.korean.trim();
             const pureKorean = removeKanji(fullKorean);
 
-            if (trimmedInput === fullKorean || trimmedInput === pureKorean) return true;
+            const candidates = [fullKorean, pureKorean];
+            pureKorean.split(/[\/,]/).forEach(p => candidates.push(p));
 
-            const possibleAnswers = pureKorean.split(/[\/,]/).map(ans => ans.trim());
-            return possibleAnswers.includes(trimmedInput);
+            return candidates.some(c => normalizeAnswer(c) === input);
         }
     }
 
