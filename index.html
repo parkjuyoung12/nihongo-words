@@ -68,6 +68,61 @@
             border-color: #f59f00;
             color: #ffffff;
         }
+        .lesson-toggle-wrap {
+            margin-bottom: 12px;
+        }
+        .btn-lesson-toggle {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 2px solid #dee2e6;
+            background-color: #f8f9fa;
+            color: #495057;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        .btn-lesson-toggle:hover {
+            border-color: #4c6ef5;
+        }
+        .btn-lesson-toggle.open {
+            border-color: #4c6ef5;
+            background-color: #edf2ff;
+        }
+        .lesson-toggle-summary {
+            color: #4c6ef5;
+            margin-left: 4px;
+        }
+        .lesson-toggle-arrow {
+            flex: none;
+            font-size: 12px;
+            color: #4c6ef5;
+        }
+        .lesson-panel.collapsed {
+            display: none;
+        }
+        .btn-lesson-close {
+            display: block;
+            width: 100%;
+            padding: 8px 0;
+            margin-bottom: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            background-color: #e9ecef;
+            color: #495057;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-lesson-close:hover {
+            background-color: #dee2e6;
+        }
         .selected-lessons-info {
             font-size: 12px;
             color: #4c6ef5;
@@ -323,7 +378,17 @@
 
 <div class="container">
     <!-- 과 버튼은 wordList를 기반으로 자동 생성됩니다 (renderLessonSelector) -->
-    <div class="lesson-selector" id="lesson-selector"></div>
+    <!-- 과 목록 열기/닫기 버튼 (닫힌 상태가 기본, 마지막 상태를 기억) -->
+    <div class="lesson-toggle-wrap">
+        <button type="button" class="btn-lesson-toggle" id="btn-lesson-toggle" onclick="toggleLessonSelector()" aria-expanded="false" aria-controls="lesson-panel">
+            <span>과 선택:<span class="lesson-toggle-summary" id="lesson-toggle-summary">전체</span></span>
+            <span class="lesson-toggle-arrow" id="lesson-toggle-arrow">열기 ▼</span>
+        </button>
+    </div>
+    <div class="lesson-panel collapsed" id="lesson-panel">
+        <div class="lesson-selector" id="lesson-selector"></div>
+        <button type="button" class="btn-lesson-close" onclick="toggleLessonSelector(false)">▲ 과 목록 닫기</button>
+    </div>
     <div class="selected-lessons-info" id="selected-lessons-info"></div>
 
     <div class="mode-selector" id="mode-selector">
@@ -2302,6 +2367,42 @@ function showMeaning(wordObj, isCorrect) {
 
     // ===== 과 선택 (여러 과 동시 선택 가능) =====
 
+    // ===== 과 목록 열기/닫기 =====
+    let isLessonSelectorOpen = false;   // 기본값: 닫힘
+
+    function loadLessonSelectorState() {
+        try {
+            isLessonSelectorOpen = (localStorage.getItem('japanese_lesson_selector_open') === '1');
+        } catch (e) {
+            isLessonSelectorOpen = false;
+        }
+    }
+
+    function applyLessonSelectorState() {
+        const panel = document.getElementById('lesson-panel');
+        const btn = document.getElementById('btn-lesson-toggle');
+        const arrow = document.getElementById('lesson-toggle-arrow');
+        if (!panel || !btn) return;
+
+        panel.classList.toggle('collapsed', !isLessonSelectorOpen);
+        btn.classList.toggle('open', isLessonSelectorOpen);
+        btn.setAttribute('aria-expanded', isLessonSelectorOpen ? 'true' : 'false');
+        if (arrow) {
+            arrow.textContent = isLessonSelectorOpen ? '닫기 ▲' : '열기 ▼';
+        }
+    }
+
+    // forceState를 주면 그 상태로, 없으면 현재 상태를 반대로 바꿈
+    function toggleLessonSelector(forceState) {
+        isLessonSelectorOpen = (typeof forceState === 'boolean') ? forceState : !isLessonSelectorOpen;
+        try {
+            localStorage.setItem('japanese_lesson_selector_open', isLessonSelectorOpen ? '1' : '0');
+        } catch (e) {
+            // 저장이 안 되는 환경에서는 이번 실행 동안만 상태 유지
+        }
+        applyLessonSelectorState();
+    }
+
     function getSortedLessonKeys() {
         return Object.keys(wordList)
             .filter(k => Array.isArray(wordList[k]))
@@ -2355,6 +2456,17 @@ function showMeaning(wordObj, isCorrect) {
             else active = (currentLesson === 'custom' && selectedLessons.has(k));
             btn.classList.toggle('active', active);
         });
+
+        const summary = document.getElementById('lesson-toggle-summary');
+        if (summary) {
+            if (currentLesson === 'memory') {
+                summary.textContent = '★ 기억 단어장';
+            } else if (currentLesson === 'custom' && selectedLessons.size > 0) {
+                summary.textContent = `${selectedLessons.size}개 과 선택`;
+            } else {
+                summary.textContent = '전체';
+            }
+        }
 
         const info = document.getElementById('selected-lessons-info');
         if (info) {
@@ -2690,7 +2802,9 @@ showMeaning(currentQuestion, currentQuestion.isCorrect === true);
 
     function startApp() {
         loadMemoryWords();
+        loadLessonSelectorState();
         renderLessonSelector();
+        applyLessonSelectorState();
         selectLesson(null, 'all');
     }
 
