@@ -372,6 +372,173 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        /* ===== 기억 단어장 목록 (필기·인쇄용) ===== */
+        .header {
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .memory-info-group {
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .btn-memory-list {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border: 1px solid #4c6ef5;
+            background-color: #edf2ff;
+            color: #4c6ef5;
+            border-radius: 12px;
+            cursor: pointer;
+            flex: none;
+            transition: all 0.2s;
+        }
+        .btn-memory-list:hover {
+            background-color: #4c6ef5;
+            color: #ffffff;
+        }
+        .memory-list-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.45);
+            display: none;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        .memory-list-overlay.open {
+            display: flex;
+        }
+        .memory-list-panel {
+            background-color: #ffffff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 720px;
+            padding: 24px 20px;
+            text-align: left;
+        }
+        .memory-list-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 12px;
+        }
+        .memory-list-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .memory-list-tools button {
+            flex: none;
+            padding: 8px 14px;
+            font-size: 13px;
+        }
+        .btn-list-print {
+            background-color: #4c6ef5;
+            color: #ffffff;
+        }
+        .btn-list-copy {
+            background-color: #20c997;
+            color: #ffffff;
+        }
+        .btn-list-close {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        .memory-list-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #495057;
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+        .memory-list-status {
+            font-size: 12px;
+            color: #2b8a3e;
+            font-weight: 600;
+            min-height: 16px;
+            margin-bottom: 8px;
+        }
+        .memory-list-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 15px;
+        }
+        .memory-list-table th,
+        .memory-list-table td {
+            border: 1px solid #dee2e6;
+            padding: 8px 6px;
+            vertical-align: middle;
+            word-break: keep-all;
+            overflow-wrap: anywhere;
+        }
+        .memory-list-table th {
+            background-color: #f8f9fa;
+            font-size: 13px;
+            color: #495057;
+        }
+        .memory-list-table td.col-no {
+            width: 40px;
+            text-align: center;
+            color: #868e96;
+            font-size: 12px;
+        }
+        .memory-list-table td.col-kanji {
+            font-size: 18px;
+        }
+        .memory-list-table td.col-kana {
+            font-size: 17px;
+        }
+        /* 빈칸 연습지: 한자·히라가나 칸을 비워서 직접 써 보는 용도 */
+        .memory-list-table.blank td {
+            padding-top: 14px;
+            padding-bottom: 14px;
+        }
+        .memory-list-table.blank td.col-kanji,
+        .memory-list-table.blank td.col-kana {
+            color: transparent;
+        }
+
+        @media print {
+            body.memory-list-open {
+                display: block;
+                min-height: 0;
+                padding: 0;
+                background-color: #ffffff;
+            }
+            body.memory-list-open .container,
+            body.memory-list-open .no-print {
+                display: none !important;
+            }
+            body.memory-list-open .memory-list-overlay {
+                position: static;
+                display: block;
+                background: none;
+                padding: 0;
+                overflow: visible;
+            }
+            body.memory-list-open .memory-list-panel {
+                max-width: none;
+                padding: 0;
+                border-radius: 0;
+            }
+            .memory-list-table th,
+            .memory-list-table td {
+                border-color: #888888;
+            }
+            .memory-list-table thead {
+                display: table-header-group;
+            }
+            .memory-list-table tr {
+                page-break-inside: avoid;
+            }
+        }
     </style>
 </head>
 <body>
@@ -401,6 +568,7 @@
         <span id="progress-info">문제 0 / 0</span>
         <div class="memory-info-group">
             <span id="memory-count-info" style="font-size: 12px; color: #f59f00;">기억 단어: 0개</span>
+            <button type="button" class="btn-memory-list" id="btn-memory-list" onclick="openMemoryList()" title="기억 단어장 목록 보기 (필기·인쇄용)">📋 목록</button>
             <button type="button" class="btn-memory-reset" id="btn-memory-reset" onclick="resetMemoryWords()" title="기억 단어장 전체 초기화">전체 초기화</button>
         </div>
     </div>
@@ -442,6 +610,29 @@
             <button type="button" class="btn-next" id="btn-next" onclick="goNext()">다음</button>
         </div>
     </form>
+</div>
+
+<!-- 기억 단어장 목록 (필기·인쇄용) -->
+<div class="memory-list-overlay" id="memory-list-overlay" onclick="if (event.target === this) closeMemoryList()">
+    <div class="memory-list-panel">
+        <div class="memory-list-title" id="memory-list-title">★ 기억 단어장</div>
+        <div class="memory-list-tools no-print">
+            <button type="button" class="btn-list-print" onclick="printMemoryList()">🖨 인쇄 / PDF 저장</button>
+            <button type="button" class="btn-list-copy" onclick="copyMemoryList()">📋 텍스트 복사</button>
+            <button type="button" class="btn-list-close" onclick="closeMemoryList()">닫기</button>
+        </div>
+        <label class="memory-list-option no-print">
+            <input type="checkbox" id="memory-list-blank" onchange="toggleMemoryListBlank()">
+            빈칸 연습지 (한자·히라가나 칸 비우기)
+        </label>
+        <div class="memory-list-status no-print" id="memory-list-status"></div>
+        <table class="memory-list-table" id="memory-list-table">
+            <thead>
+                <tr><th>번호</th><th>한자</th><th>히라가나</th><th>한글 뜻</th></tr>
+            </thead>
+            <tbody id="memory-list-body"></tbody>
+        </table>
+    </div>
 </div>
 
 <script>
@@ -2798,6 +2989,139 @@ showMeaning(currentQuestion, currentQuestion.isCorrect === true);
 
         isTraceCanvasInitialized = true;
     }
+
+    // ===== 기억 단어장 목록 (필기·인쇄용) =====
+    // 히라가나·가타카나·한자가 하나라도 들어 있으면 "일본어 표기"로 봄
+    const JP_CHAR_RE = /[぀-ヿ㐀-鿿豈-﫿ｦ-ﾟ々〆]/;
+
+    // korean 값 "뜻 (漢字)"를 한자 / 한글 뜻으로 나눔
+    // - 반각 ( ) 와 전각 （ ） 괄호 모두 처리
+    // - (사물), (차를) 처럼 한글 설명이 든 괄호는 뜻에 그대로 남김
+    function parseWordForList(word) {
+        const korean = (word && typeof word.korean === 'string') ? word.korean : '';
+        const kana = (word && typeof word.japanese === 'string') ? word.japanese.trim() : '';
+        const kanjiParts = [];
+        const meaning = korean
+            .replace(/[（(]([^（()）]*)[）)]/g, (all, inner) => {
+                if (JP_CHAR_RE.test(inner)) {
+                    kanjiParts.push(inner.trim());
+                    return ' ';
+                }
+                return all;
+            })
+            .replace(/[\s　]+/g, ' ')
+            .trim();
+        return { kanji: kanjiParts.join(' / '), kana: kana, meaning: meaning };
+    }
+
+    function getMemoryListRows() {
+        return memoryWords
+            .filter(w => w && typeof w.korean === 'string' && typeof w.japanese === 'string')
+            .map(parseWordForList);
+    }
+
+    function setMemoryListStatus(text) {
+        const el = document.getElementById('memory-list-status');
+        if (el) el.textContent = text;
+    }
+
+    function renderMemoryList() {
+        const rows = getMemoryListRows();
+        document.getElementById('memory-list-title').textContent = `★ 기억 단어장 (${rows.length}개)`;
+
+        const tbody = document.getElementById('memory-list-body');
+        tbody.innerHTML = '';
+        rows.forEach((row, i) => {
+            const tr = document.createElement('tr');
+            [
+                [String(i + 1), 'col-no'],
+                [row.kanji, 'col-kanji'],
+                [row.kana, 'col-kana'],
+                [row.meaning, 'col-meaning']
+            ].forEach(([text, cls]) => {
+                const td = document.createElement('td');
+                td.className = cls;
+                td.textContent = text;
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+    }
+
+    function openMemoryList() {
+        if (memoryWords.length === 0) {
+            alert('기억 단어장에 저장된 단어가 없습니다.');
+            return;
+        }
+        if (document.activeElement) document.activeElement.blur();
+        renderMemoryList();
+        setMemoryListStatus('');
+        document.getElementById('memory-list-overlay').classList.add('open');
+        document.body.classList.add('memory-list-open');
+    }
+
+    function closeMemoryList() {
+        document.getElementById('memory-list-overlay').classList.remove('open');
+        document.body.classList.remove('memory-list-open');
+    }
+
+    function toggleMemoryListBlank() {
+        const checked = document.getElementById('memory-list-blank').checked;
+        document.getElementById('memory-list-table').classList.toggle('blank', checked);
+    }
+
+    function printMemoryList() {
+        window.print();
+    }
+
+    // 탭으로 구분된 텍스트 → 메모장·엑셀·구글 시트에 그대로 붙여넣기 가능
+    function buildMemoryListText() {
+        const lines = ['번호\t한자\t히라가나\t한글 뜻'];
+        getMemoryListRows().forEach((row, i) => {
+            lines.push([i + 1, row.kanji, row.kana, row.meaning].join('\t'));
+        });
+        return lines.join('\n');
+    }
+
+    function copyMemoryList() {
+        const text = buildMemoryListText();
+        const done = () => setMemoryListStatus('복사했습니다. 메모장·엑셀·구글 시트에 붙여넣을 수 있어요.');
+        const fallback = () => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.top = '-1000px';
+            document.body.appendChild(ta);
+            ta.select();
+            ta.setSelectionRange(0, text.length);
+            let ok = false;
+            try {
+                ok = document.execCommand('copy');
+            } catch (e) {
+                ok = false;
+            }
+            document.body.removeChild(ta);
+            if (ok) {
+                done();
+            } else {
+                setMemoryListStatus('자동 복사가 안 되는 환경입니다. 표를 직접 선택해서 복사해 주세요.');
+            }
+        };
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(done).catch(fallback);
+        } else {
+            fallback();
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        const overlay = document.getElementById('memory-list-overlay');
+        if (e.key === 'Escape' && overlay && overlay.classList.contains('open')) {
+            closeMemoryList();
+        }
+    });
 
     function startApp() {
         loadMemoryWords();
